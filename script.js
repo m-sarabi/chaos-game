@@ -10,6 +10,9 @@ const ctx = canvas.getContext('2d');
 let stop = false;
 let playing = false;
 let speed = 1;
+const MAX_SPEED = 20;
+
+speedInput.max = MAX_SPEED;
 
 canvas.width = 600;
 canvas.height = 600;
@@ -192,7 +195,7 @@ sidesInput.addEventListener('change', () => {
 });
 
 speedInput.addEventListener('change', () => {
-    speed = Number(Math.min(Math.max(1, speedInput.value), 10));
+    speed = Number(Math.min(Math.max(1, speedInput.value), MAX_SPEED));
 });
 
 stepButton.addEventListener('click', () => {
