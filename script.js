@@ -179,11 +179,16 @@ function animateLine(start, end, middle) {
 
 // events
 sidesInput.addEventListener('change', () => {
-    sides = parseInt(sidesInput.value);
-    drawShape();
-    currentPoint = getRandomPointInShape(vertices, center);
-    burIn();
     stop = true;
+    stopButton.disabled = true;
+    playButton.disabled = false;
+    stepButton.disabled = false;
+    requestAnimationFrame(() => {
+        sides = parseInt(sidesInput.value);
+        drawShape();
+        currentPoint = getRandomPointInShape(vertices, center);
+        burIn();
+    });
 });
 
 speedInput.addEventListener('change', () => {
