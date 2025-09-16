@@ -179,7 +179,6 @@ function animateLine(start, end, middle) {
 sidesInput.addEventListener('change', () => {
     sides = parseInt(sidesInput.value);
     drawShape();
-    pointSize = Math.sqrt(1 / sides);
     currentPoint = getRandomPointInShape(vertices, center);
     burIn();
     stop = true;
