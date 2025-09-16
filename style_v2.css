@@ -22,9 +22,12 @@ body {
     background-color: #1e1e1e;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    width: calc(100vw - 40px);
+    max-width: 640px;
 }
 
 canvas {
+    width: 100%;
     border: 2px solid #333;
     border-radius: 8px;
     background-color: #ffffff;
@@ -99,4 +102,26 @@ button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     color: #999;
+}
+
+@media (max-width: 640px) {
+    .container {
+        padding: 10px;
+    }
+
+    .controls {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .button-group {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    button {
+        width: 80%;
+    }
 }

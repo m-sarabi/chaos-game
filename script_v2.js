@@ -1,4 +1,5 @@
 const canvas = document.getElementById('chaos-canvas');
+const container = document.querySelector('.container');
 const stepButton = document.getElementById('chaos-step');
 const stopButton = document.getElementById('chaos-stop');
 const playButton = document.getElementById('chaos-play');
@@ -11,13 +12,22 @@ let stop = false;
 let playing = false;
 let speed = 1;
 const MAX_SPEED = 20;
+let center, radius;
 
 speedInput.max = MAX_SPEED;
 
-canvas.width = 600;
-canvas.height = 600;
-
 ctx.strokeStyle = 'white';
+resizeCanvas();
+
+function resizeCanvas() {
+    const maxWidth = 600;
+    const size = Math.min(container.offsetWidth, maxWidth);
+    canvas.width = size;
+    canvas.height = size;
+
+    center = {x: canvas.width / 2, y: canvas.height / 2};
+    radius = canvas.width / 2 - 10;
+}
 
 function getRandomPointInShape(vertices, center) {
     // 1. Randomly select one of the triangles that form the polygon.
@@ -76,9 +86,6 @@ function drawShape() {
     currentPoint = getRandomPointInShape(vertices, center);
     burIn();
 }
-
-const center = {x: canvas.width / 2, y: canvas.height / 2};
-const radius = canvas.width / 2 - 10;
 
 let vertices = [];
 let sides = 3;
@@ -221,4 +228,9 @@ playButton.addEventListener('click', () => {
     stopButton.disabled = false;
     playButton.disabled = true;
     draw().then();
+});
+
+window.addEventListener('resize', () => {
+    resizeCanvas();
+    drawShape();
 });
