@@ -55,6 +55,13 @@ function drawShape() {
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = 'white';
+
+    ctx.beginPath();
+    ctx.strokeStyle = '#555';
+    ctx.arc(center.x, center.y, radius + 10, 0, Math.PI * 2, true);
+    ctx.stroke();
+    ctx.strokeStyle = 'white';
+
     ctx.beginPath();
     ctx.moveTo(vertices[0].x, vertices[0].y);
     for (let i = 0; i < vertices.length; i++) {
@@ -69,11 +76,6 @@ function drawShape() {
 
 const center = {x: canvas.width / 2, y: canvas.height / 2};
 const radius = canvas.width / 2 - 10;
-
-ctx.beginPath();
-ctx.strokeStyle = '#555';
-ctx.arc(center.x, center.y, radius + 10, 0, Math.PI * 2, true);
-ctx.stroke();
 
 let vertices = [];
 let sides = 3;
