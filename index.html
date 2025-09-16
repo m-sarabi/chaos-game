@@ -8,19 +8,44 @@
     <link rel="icon" href="./assets/icon.png" type="image/png">
 </head>
 <body>
+<button id="show-options">
+    <svg width="24" height="24">
+        <use href="./assets/bars.svg"></use>
+    </svg>
+</button>
 <div class="container">
-    <canvas id="chaos-canvas"></canvas>
-    <div class="controls">
+    <div class="canvas-container">
+        <canvas id="chaos-canvas"></canvas>
+        <div class="canvas-controls">
+            <div class="button-group">
+                <button id="chaos-play">Play</button>
+                <button id="chaos-stop" disabled>Stop</button>
+                <button id="chaos-step">Step</button>
+            </div>
+        </div>
+    </div>
+    <div class="overlay disabled"></div>
+    <div class="options">
+        <h2>Options</h2>
         <div class="input-group">
             <label for="chaos-sides">Sides:</label>
             <input type="number" id="chaos-sides" value="3" min="3" max="20">
-            <label for="chaos-speed">Speed:</label>
-            <input type="number" id="chaos-speed" value="1" min="1" max="20">
         </div>
-        <div class="button-group">
-            <button id="chaos-play">Play</button>
-            <button id="chaos-stop" disabled>Stop</button>
-            <button id="chaos-step">Step</button>
+        <div class="input-group">
+            <label for="chaos-speed">Speed:</label>
+            <input type="number" id="chaos-speed" value="1" min="1">
+        </div>
+        <div class="input-group">
+            <label for="canvas-size">Canvas Size:</label>
+            <input type="number" id="canvas-size" value="800" min="100">
+        </div>
+        <div class="input-group">
+            <label for="point-size">Point Size:</label>
+            <input type="number" id="point-size" value="1" min="0.1" step="0.1">
+        </div>
+        <div class="input-group">
+            <label for="point-alpha">Point Alpha (0 - 1):</label>
+            <input type="number" id="point-alpha" value="1" min="0" max="1" step="0.01">
         </div>
     </div>
 </div>

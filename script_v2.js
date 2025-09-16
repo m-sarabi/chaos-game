@@ -1,32 +1,68 @@
 const canvas = document.getElementById('chaos-canvas');
-const container = document.querySelector('.container');
+const optionsContainer = document.querySelector('.options');
+const controlsContainer = document.querySelector('.canvas-controls');
 const stepButton = document.getElementById('chaos-step');
 const stopButton = document.getElementById('chaos-stop');
 const playButton = document.getElementById('chaos-play');
+const toggleOptionsButton = document.getElementById('show-options');
 const sidesInput = document.getElementById('chaos-sides');
 const speedInput = document.getElementById('chaos-speed');
+const canvasSizeInput = document.getElementById('canvas-size');
+const pointSizeInput = document.getElementById('point-size');
+const pointAlphaInput = document.getElementById('point-alpha');
+const overlay = document.querySelector('.overlay');
 
 const ctx = canvas.getContext('2d');
 
+const MAX_SPEED = 500_000;
+let optionsOpen = false;
 let stop = false;
 let playing = false;
-let speed = 1;
-const MAX_SPEED = 20;
+let speed = speedInput.value;
 let center, radius;
-
-speedInput.max = MAX_SPEED;
+let vertices = [];
+let sides = 3;
+let currentPoint;
+let canvasSize = Math.floor(Math.min(window.innerHeight - controlsContainer.clientHeight - 50, window.innerWidth - 50) / 10) * 10;
+canvasSizeInput.value = canvasSize;
+let pointSize = pointSizeInput.value;
+let pointColor = `rgba(255, 255, 255, ${pointAlphaInput.value})`;
 
 ctx.strokeStyle = 'white';
 resizeCanvas();
 
 function resizeCanvas() {
-    const maxWidth = 600;
-    const size = Math.min(container.offsetWidth, maxWidth);
+    const size = canvasSize;
     canvas.width = size;
     canvas.height = size;
 
     center = {x: canvas.width / 2, y: canvas.height / 2};
     radius = canvas.width / 2 - 10;
+}
+
+function handleResize() {
+    resizeCanvas();
+    if (document.documentElement.clientWidth > 640) {
+        console.log('big', document.documentElement.clientWidth);
+        optionsOpen = false;
+        toggleOptionsButton.style.display = 'none';
+    } else {
+        console.log('small', document.documentElement.clientWidth);
+        toggleOptionsButton.style.display = 'flex';
+    }
+    optionsContainer.classList.remove('open');
+    overlay.classList.add('disabled');
+}
+
+function toggleOptions() {
+    if (optionsOpen) {
+        optionsContainer.classList.remove('open');
+        overlay.classList.add('disabled');
+    } else {
+        optionsContainer.classList.add('open');
+        overlay.classList.remove('disabled');
+    }
+    optionsOpen = !optionsOpen;
 }
 
 function getRandomPointInShape(vertices, center) {
@@ -52,6 +88,7 @@ function getRandomPointInShape(vertices, center) {
 
 function drawPoint(point, size) {
     ctx.beginPath();
+    ctx.fillStyle = pointColor;
     ctx.arc(point.x, point.y, size, 0, Math.PI * 2, true);
     // ctx.fillStyle = color;
     ctx.fill();
@@ -86,11 +123,6 @@ function drawShape() {
     currentPoint = getRandomPointInShape(vertices, center);
     burIn();
 }
-
-let vertices = [];
-let sides = 3;
-let currentPoint;
-let pointSize = 1;
 
 drawShape();
 
@@ -202,7 +234,7 @@ sidesInput.addEventListener('change', () => {
 });
 
 speedInput.addEventListener('change', () => {
-    speed = Number(Math.min(Math.max(1, speedInput.value), MAX_SPEED));
+    speed = Math.min(Math.max(1, speedInput.value), MAX_SPEED);
 });
 
 stepButton.addEventListener('click', () => {
@@ -230,7 +262,30 @@ playButton.addEventListener('click', () => {
     draw().then();
 });
 
-window.addEventListener('resize', () => {
+canvasSizeInput.addEventListener('change', () => {
+    canvasSize = canvasSizeInput.value;
     resizeCanvas();
+    drawShape();
+});
+
+pointSizeInput.addEventListener('change', () => {
+    pointSize = Math.max(0.1, pointSizeInput.value);
+});
+
+pointAlphaInput.addEventListener('change', () => {
+    pointColor = `rgba(255, 255, 255, ${pointAlphaInput.value})`;
+});
+
+overlay.addEventListener('click', () => {
+    overlay.classList.add('disabled');
+    toggleOptions();
+});
+
+toggleOptionsButton.addEventListener('click', () => {
+    toggleOptions();
+});
+
+window.addEventListener('resize', () => {
+    handleResize();
     drawShape();
 });
