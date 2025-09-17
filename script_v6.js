@@ -303,9 +303,11 @@ colorSwitch.addEventListener('change', () => {
     isColored = colorSwitch.checked;
 });
 
-overlay.addEventListener('click', () => {
-    overlay.classList.add('disabled');
-    toggleOptions();
+overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) {
+        overlay.classList.add('disabled');
+        toggleOptions();
+    }
 });
 
 toggleOptionsButton.addEventListener('click', () => {
