@@ -128,12 +128,12 @@ function drawShape() {
     ctx.stroke();
 
     currentPoint = getRandomPointInShape(vertices, center);
-    burIn();
+    burnIn();
 }
 
 drawShape();
 
-function burIn() {
+function burnIn() {
     for (let i = 0; i < sides * 2; i++) {
         const randomVertex = vertices[Math.floor(Math.random() * vertices.length)];
 
@@ -160,7 +160,7 @@ async function draw(once = false) {
 
     if (isColored) {
         const length = Math.hypot(randomVertex.x - newPoint.x, randomVertex.y - newPoint.y) * 360 / radius;
-        drawPoint(currentPoint, pointSize, length);
+        drawPoint(currentPoint, pointSize, 360 - length);
     } else {
         drawPoint(currentPoint, pointSize);
     }
@@ -243,7 +243,7 @@ sidesInput.addEventListener('change', () => {
         sides = parseInt(sidesInput.value);
         drawShape();
         currentPoint = getRandomPointInShape(vertices, center);
-        burIn();
+        burnIn();
     });
 });
 
@@ -283,11 +283,11 @@ canvasSizeInput.addEventListener('change', () => {
 });
 
 pointSizeInput.addEventListener('change', () => {
-    pointSize = Math.max(0.1, pointSizeInput.value);
+    pointSize = Math.max(0, pointSizeInput.value);
 });
 
 pointAlphaInput.addEventListener('change', () => {
-    pointColor = `rgba(255, 255, 255, ${pointAlphaInput.value})`;
+    pointColor = `rgba(255, 255, 255, ${Math.min(Math.max(0, pointAlphaInput.value), 1)})`;
 });
 
 linesSwitch.addEventListener('change', () => {
