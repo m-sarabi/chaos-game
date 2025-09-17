@@ -65,7 +65,7 @@ canvas {
     font-size: 1.1em;
 }
 .input-group label {
-    width: 100px;
+    width: 110px;
 }
 .input-group input {
     width: 80px;
@@ -145,7 +145,58 @@ button:disabled {
     pointer-events: none;
 }
 
-@media (max-width: 640px) {
+.switch > input {
+    width: 50px;
+    height: 30px;
+    margin: 5px 0;
+    cursor: pointer;
+    position: relative;
+    appearance: none;
+}
+
+.switch > input::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #555;
+    border-radius: 40px;
+}
+
+.switch > input:checked::before {
+    content: "";
+    background: #0e399c;
+    border-radius: 40px;
+}
+
+.switch > input:active::before {
+    background: #474747;
+}
+
+.switch > input:checked:active::before {
+    background: #0d348f;
+}
+
+.switch > input::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 24px;
+    height: 24px;
+    background: #eee;
+    border-radius: 40px;
+    transition: transform 0.2s ease;
+}
+
+.switch > input:checked::after {
+    transform: translateX(20px);
+}
+
+.switch > input:active::after {
+    background: #ddd;
+}
+
+@media (max-width: 720px) {
     .container {
         padding: 10px;
     }

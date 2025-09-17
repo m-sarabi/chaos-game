@@ -11,6 +11,8 @@ const canvasSizeInput = document.getElementById('canvas-size');
 const pointSizeInput = document.getElementById('point-size');
 const pointAlphaInput = document.getElementById('point-alpha');
 const overlay = document.querySelector('.overlay');
+const linesSwitch = document.getElementById('show-lines');
+const colorSwitch = document.getElementById('colored-switch');
 
 const ctx = canvas.getContext('2d');
 
@@ -27,9 +29,16 @@ let canvasSize = Math.floor(Math.min(window.innerHeight - controlsContainer.clie
 canvasSizeInput.value = canvasSize;
 let pointSize = pointSizeInput.value;
 let pointColor = `rgba(255, 255, 255, ${pointAlphaInput.value})`;
+let linesColor = 'white';
+let isColored = false;
 
 ctx.strokeStyle = 'white';
 resizeCanvas();
+
+function hsv2rgb(h, s = 1, v = 1) {
+    const f = n => v * (1 - s * Math.max(0, Math.min(n = (n + h / 60) % 6, 4 - n, 1)));
+    return `rgba(${f(5) * 255}, ${f(3) * 255}, ${f(1) * 255}, ${pointAlphaInput.value})`;
+}
 
 function resizeCanvas() {
     const size = canvasSize;
@@ -42,12 +51,10 @@ function resizeCanvas() {
 
 function handleResize() {
     resizeCanvas();
-    if (document.documentElement.clientWidth > 640) {
-        console.log('big', document.documentElement.clientWidth);
+    if (document.documentElement.clientWidth > 720) {
         optionsOpen = false;
         toggleOptionsButton.style.display = 'none';
     } else {
-        console.log('small', document.documentElement.clientWidth);
         toggleOptionsButton.style.display = 'flex';
     }
     optionsContainer.classList.remove('open');
@@ -86,11 +93,10 @@ function getRandomPointInShape(vertices, center) {
     return {x, y};
 }
 
-function drawPoint(point, size) {
+function drawPoint(point, size, length = null) {
     ctx.beginPath();
-    ctx.fillStyle = pointColor;
+    ctx.fillStyle = length === null ? pointColor : hsv2rgb(length);
     ctx.arc(point.x, point.y, size, 0, Math.PI * 2, true);
-    // ctx.fillStyle = color;
     ctx.fill();
 }
 
@@ -104,13 +110,14 @@ function drawShape() {
 
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = pointColor;
 
     ctx.beginPath();
-    ctx.strokeStyle = '#555';
+    ctx.strokeStyle = linesColor;
+    ctx.lineWidth = 0.5;
     ctx.arc(center.x, center.y, radius + 10, 0, Math.PI * 2, true);
     ctx.stroke();
-    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 1;
 
     ctx.beginPath();
     ctx.moveTo(vertices[0].x, vertices[0].y);
@@ -143,13 +150,20 @@ async function draw(once = false) {
     newPoint.x = (currentPoint.x + randomVertex.x) / 2;
     newPoint.y = (currentPoint.y + randomVertex.y) / 2;
 
+
     if (playing) {
         await animateLine(currentPoint, randomVertex, newPoint);
         playing = false;
     }
 
     currentPoint = newPoint;
-    drawPoint(currentPoint, pointSize);
+
+    if (isColored) {
+        const length = Math.hypot(randomVertex.x - newPoint.x, randomVertex.y - newPoint.y) * 360 / radius;
+        drawPoint(currentPoint, pointSize, length);
+    } else {
+        drawPoint(currentPoint, pointSize);
+    }
     if (!stop && !once) {
         requestAnimationFrame(() => {
             for (let i = 0; i < speed - 1; i++) {
@@ -274,6 +288,19 @@ pointSizeInput.addEventListener('change', () => {
 
 pointAlphaInput.addEventListener('change', () => {
     pointColor = `rgba(255, 255, 255, ${pointAlphaInput.value})`;
+});
+
+linesSwitch.addEventListener('change', () => {
+    if (linesSwitch.checked) {
+        linesColor = 'white';
+    } else {
+        linesColor = 'transparent';
+    }
+    drawShape();
+});
+
+colorSwitch.addEventListener('change', () => {
+    isColored = colorSwitch.checked;
 });
 
 overlay.addEventListener('click', () => {
