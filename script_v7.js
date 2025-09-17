@@ -31,6 +31,7 @@ let pointSize = pointSizeInput.value;
 let pointColor = `rgba(255, 255, 255, ${pointAlphaInput.value})`;
 let linesColor = 'white';
 let isColored = false;
+let oldWidth = document.documentElement.clientWidth;
 
 ctx.strokeStyle = 'white';
 resizeCanvas();
@@ -50,6 +51,10 @@ function resizeCanvas() {
 }
 
 function handleResize() {
+    if (document.documentElement.clientWidth === oldWidth) {
+        return;
+    }
+    oldWidth = document.documentElement.clientWidth;
     resizeCanvas();
     if (document.documentElement.clientWidth > 720) {
         optionsOpen = false;
