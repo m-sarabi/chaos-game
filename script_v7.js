@@ -55,7 +55,7 @@ function handleResize() {
         return;
     }
     oldWidth = document.documentElement.clientWidth;
-    resizeCanvas();
+    // resizeCanvas();
     if (document.documentElement.clientWidth > 720) {
         optionsOpen = false;
         toggleOptionsButton.style.display = 'none';
@@ -321,5 +321,5 @@ toggleOptionsButton.addEventListener('click', () => {
 
 window.addEventListener('resize', () => {
     handleResize();
-    drawShape();
+    // drawShape();
 });
