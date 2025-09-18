@@ -10,13 +10,14 @@ const speedInput = document.getElementById('chaos-speed');
 const canvasSizeInput = document.getElementById('canvas-size');
 const pointSizeInput = document.getElementById('point-size');
 const pointAlphaInput = document.getElementById('point-alpha');
+const jumpDistanceInput = document.getElementById('jump-distance');
 const overlay = document.querySelector('.overlay');
 const linesSwitch = document.getElementById('show-lines');
 const colorSwitch = document.getElementById('colored-switch');
 
 const ctx = canvas.getContext('2d');
 
-const MAX_SPEED = 500_000;
+const MAX_SPEED = 50_000;
 let optionsOpen = false;
 let stop = false;
 let playing = false;
@@ -29,6 +30,7 @@ let canvasSize = Math.floor(Math.min(window.innerHeight - controlsContainer.clie
 canvasSizeInput.value = canvasSize;
 let pointSize = pointSizeInput.value;
 let pointColor = `rgba(255, 255, 255, ${pointAlphaInput.value})`;
+let jumpDistance = jumpDistanceInput.value;
 let linesColor = 'white';
 let isColored = false;
 let oldWidth = document.documentElement.clientWidth;
@@ -139,11 +141,11 @@ function drawShape() {
 drawShape();
 
 function burnIn() {
-    for (let i = 0; i < sides * 2; i++) {
+    for (let i = 0; i < 20; i++) {
         const randomVertex = vertices[Math.floor(Math.random() * vertices.length)];
 
-        currentPoint.x = (currentPoint.x + randomVertex.x) / 2;
-        currentPoint.y = (currentPoint.y + randomVertex.y) / 2;
+        currentPoint.x = currentPoint.x + (randomVertex.x - currentPoint.x) * jumpDistance;
+        currentPoint.y = currentPoint.y + (currentPoint.y - currentPoint.y) * jumpDistance;
     }
 }
 
@@ -152,8 +154,8 @@ async function draw(once = false) {
 
     const newPoint = {};
 
-    newPoint.x = (currentPoint.x + randomVertex.x) / 2;
-    newPoint.y = (currentPoint.y + randomVertex.y) / 2;
+    newPoint.x = currentPoint.x + (randomVertex.x - currentPoint.x) * jumpDistance;
+    newPoint.y = currentPoint.y + (randomVertex.y - currentPoint.y) * jumpDistance;
 
 
     if (playing) {
@@ -293,6 +295,10 @@ pointSizeInput.addEventListener('change', () => {
 
 pointAlphaInput.addEventListener('change', () => {
     pointColor = `rgba(255, 255, 255, ${Math.min(Math.max(0, pointAlphaInput.value), 1)})`;
+});
+
+jumpDistanceInput.addEventListener('change', () => {
+    jumpDistance = Math.max(Math.min(1, jumpDistanceInput.value), 0);
 });
 
 linesSwitch.addEventListener('change', () => {
