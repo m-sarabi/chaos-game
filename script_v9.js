@@ -5,6 +5,7 @@ const controlsContainer = document.querySelector('.canvas-controls');
 const stopButton = document.getElementById('chaos-stop');
 const playButton = document.getElementById('chaos-play');
 const eraseButton = document.getElementById('chaos-erase');
+const downloadButton = document.getElementById('chaos-download');
 const toggleOptionsButton = document.getElementById('show-options');
 const sidesInput = document.getElementById('chaos-sides');
 const speedInput = document.getElementById('chaos-speed');
@@ -306,6 +307,15 @@ playButton.addEventListener('click', () => {
 eraseButton.addEventListener('click', () => {
     drawShape();
     updateShowCanvas();
+});
+
+downloadButton.addEventListener('click', () => {
+    const imageURL = canvas.toDataURL('image/png');
+
+    const link = document.createElement('a');
+    link.href = imageURL;
+    link.download = `chaos-game-${Date.now()}.png`;
+    link.click();
 });
 
 canvasSizeInput.addEventListener('change', () => {
