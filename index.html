@@ -18,9 +18,10 @@
         <canvas id="chaos-canvas"></canvas>
         <div class="canvas-controls">
             <div class="button-group">
-                <button id="chaos-play">Play</button>
-                <button id="chaos-stop" disabled>Stop</button>
-                <button id="chaos-step">Step</button>
+                <button id="chaos-play"><svg width="24" height="24"><use href="./assets/play.svg"></use></svg></button>
+                <button id="chaos-stop" disabled><svg width="24" height="24"><use href="./assets/stop.svg"></use></svg></button>
+                <button id="chaos-erase"><svg width="24" height="24"><use href="./assets/eraser.svg"></use></svg></button>
+<!--                <button id="chaos-step"><svg width="24" height="24"><use href="./assets/step-forward.svg"></use></svg></button>-->
             </div>
         </div>
     </div>
@@ -37,7 +38,7 @@
         </div>
         <div class="input-group">
             <label for="canvas-size">Canvas Size:<sup>*</sup>:</label>
-            <input type="number" id="canvas-size" value="800" min="100">
+            <input type="number" id="canvas-size" value="1000" min="100">
         </div>
         <div class="input-group">
             <label for="point-size">Point Size:</label>
