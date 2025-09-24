@@ -49,6 +49,22 @@ function hsv2rgb(h, s = 1, v = 1) {
     return `rgba(${f(5) * 255}, ${f(3) * 255}, ${f(1) * 255}, ${pointAlphaInput.value})`;
 }
 
+function rotatePoint(x, y, angle) {
+    // Translate point to origin
+    const dx = x - center.x;
+    const dy = y - center.y;
+
+    // Apply rotation
+    const rotatedX = dx * Math.cos(angle) - dy * Math.sin(angle);
+    const rotatedY = dx * Math.sin(angle) + dy * Math.cos(angle);
+
+    // Translate back
+    return {
+        x: rotatedX + center.x,
+        y: rotatedY + center.y,
+    };
+}
+
 function updateShowCanvas() {
     showCtx.clearRect(0, 0, canvas.width, canvas.height);
     showCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, showCanvas.width, showCanvas.height);
@@ -119,11 +135,19 @@ function getRandomPointInShape(vertices, center) {
     return {x, y};
 }
 
-function drawPoint(point, size, length = null) {
-    ctx.beginPath();
+function drawPoint(point, size, length = null, symmetrical = true) {
     ctx.fillStyle = length === null ? pointColor : hsv2rgb(length);
+    ctx.beginPath();
     ctx.arc(point.x, point.y, size, 0, Math.PI * 2, true);
     ctx.fill();
+    if (symmetrical) {
+        for (let i = 1; i < sides; i++) {
+            const newPoint = rotatePoint(point.x, point.y, 2 * Math.PI / sides * i);
+            ctx.beginPath();
+            ctx.arc(newPoint.x, newPoint.y, size, 0, Math.PI * 2, true);
+            ctx.fill();
+        }
+    }
 }
 
 function drawShape() {
