@@ -338,7 +338,7 @@ downloadButton.addEventListener('click', () => {
 
     const link = document.createElement('a');
     link.href = imageURL;
-    link.download = `chaos-game-${Date.now()}.png`;
+    link.download = `chaos-game-${new Date(Date.now()).toTimeString().split(' ')[0].replaceAll(':', '_')}-${Math.round(jumpDistance * 10000) / 10000}.png`;
     link.click();
 });
 
