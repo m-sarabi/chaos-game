@@ -19,7 +19,7 @@ class ChaosGame {
             padding: 10,
             burnInCount: 300,
             updateDelay: 50,
-            something: 0.5,
+            gammaExponent: 0.5,
             batchSize: 10_000,
             autoStop: true,
             drawCircle: false,
@@ -174,6 +174,15 @@ class ChaosGame {
             });
             angle += 2 * Math.PI / this.settings.sides;
         }
+        // todo: add more vertices options (center, midpoint of sides)
+        // for (let i = 0; i < this.settings.sides; i++) {
+        //     let i2 = (i + 1) % this.settings.sides;
+        //     this.vertices.push({
+        //         x: (this.vertices[i].x + this.vertices[i2].x) / 2,
+        //         y: (this.vertices[i].y + this.vertices[i2].y) / 2,
+        //     });
+        // }
+        // this.vertices.push(this.center);
         this.fullCtx.fillRect(0, 0, this.fullCanvas.width, this.fullCanvas.height);
         this.erase();
         this.currentPoint = this.getRandomPointInShape();
@@ -244,8 +253,7 @@ class ChaosGame {
 
             if (val > this.maxValue) this.maxValue = val;
 
-            // const pixelValue = (val / this.maxValue) ** this.settings.something * 255 | 0;
-            val = (val / this.maxValue) ** this.settings.something;
+            val = (val / this.maxValue) ** this.settings.gammaExponent;
             // const pixelValue = Math.log(1 + val) / Math.log(1 + this.maxValue) * 255 | 0;
             const ler = (a, b, t) => Math.round(a + t * (b - a));
             const pixelValue = {
@@ -260,8 +268,7 @@ class ChaosGame {
 
     rescaleAll() {
         for (let i = 0; i < this.settings.canvasSize ** 2; i++) {
-            // const pixelValue = (val / this.maxValue) ** this.settings.something * 255 | 0;
-            const val = (this.imageMatrix[i] / this.maxValue) ** this.settings.something;
+            const val = (this.imageMatrix[i] / this.maxValue) ** this.settings.gammaExponent;
             const ler = (a, b, t) => Math.round(a + t * (b - a));
             const pixelValue = {
                 r: ler(this.bgColor.r, this.fgColor.r, val),
@@ -308,8 +315,8 @@ class ChaosGame {
     drawPolygon() {
         this.fullCtx.beginPath();
         this.fullCtx.moveTo(this.vertices[0].x, this.vertices[0].y);
-        for (let i = 0; i < this.vertices.length; i++) {
-            const index = (i + 1) % this.vertices.length;
+        for (let i = 0; i < this.settings.sides; i++) {
+            const index = (i + 1) % this.settings.sides;
             this.fullCtx.lineTo(this.vertices[index].x, this.vertices[index].y);
         }
         this.fullCtx.stroke();
@@ -443,6 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
         size: document.getElementById('canvas-size'),
         padding: document.getElementById('padding'),
         jumpDistance: document.getElementById('jump-distance'),
+        gammaExponent: document.getElementById('gamma-exponent'),
         threshold: document.getElementById('chaos-new-pixels-threshold'),
 
         // toggles
@@ -489,8 +497,12 @@ document.addEventListener('DOMContentLoaded', () => {
             chaosGame.reset();
         });
         elements.jumpDistance.addEventListener('change', () => {
-            // chaosGame.settings.jumpDistance = Math.max(Math.min(1, elements.jumpDistance.value), 0);
             chaosGame.settings.jumpDistance = elements.jumpDistance.value;
+        });
+        elements.gammaExponent.addEventListener('change', () => {
+            chaosGame.settings.gammaExponent = elements.gammaExponent.value;
+            chaosGame.rescaleAll();
+            chaosGame.updateCanvas();
         });
         elements.threshold.addEventListener('change', () => {
             chaosGame.settings.stabilityNewPixelsThreshold = Math.max(1, elements.threshold.value);
@@ -552,6 +564,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.size.value = chaosGame.settings.canvasSize;
         elements.padding.value = chaosGame.settings.padding;
         elements.jumpDistance.value = chaosGame.settings.jumpDistance;
+        elements.gammaExponent.value = chaosGame.settings.gammaExponent;
         elements.threshold.value = chaosGame.settings.stabilityNewPixelsThreshold;
         elements.threshold.disabled = !chaosGame.settings.autoStop;
         elements.linesToggle.checked = chaosGame.settings.drawCircle;
