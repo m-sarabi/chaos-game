@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chaos Game</title>
-    <link rel="stylesheet" href="style_v5.css">
+    <link rel="stylesheet" href="style_v6.css">
     <link rel="icon" href="./assets/icon.png" type="image/png">
 </head>
 <body>
@@ -18,53 +18,74 @@
         <canvas id="chaos-canvas"></canvas>
         <div class="canvas-controls">
             <div class="button-group">
-                <button id="chaos-play"><svg width="24" height="24"><use href="./assets/play.svg"></use></svg></button>
-                <button id="chaos-stop" disabled><svg width="24" height="24"><use href="./assets/stop.svg"></use></svg></button>
-                <button id="chaos-erase"><svg width="24" height="24"><use href="./assets/eraser.svg"></use></svg></button>
-                <button id="chaos-download"><svg width="24" height="24"><use href="./assets/download.svg"></use></svg></button>
-<!--                <button id="chaos-step"><svg width="24" height="24"><use href="./assets/step-forward.svg"></use></svg></button>-->
+                <button id="chaos-play">
+                    <svg width="24" height="24">
+                        <use href="./assets/play.svg"></use>
+                    </svg>
+                </button>
+                <button id="chaos-stop" disabled>
+                    <svg width="24" height="24">
+                        <use href="./assets/stop.svg"></use>
+                    </svg>
+                </button>
+                <button id="chaos-erase">
+                    <svg width="24" height="24">
+                        <use href="./assets/eraser.svg"></use>
+                    </svg>
+                </button>
+                <button id="chaos-download">
+                    <svg width="24" height="24">
+                        <use href="./assets/download.svg"></use>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
     <div class="overlay disabled"></div>
     <div class="options">
         <h2>Options</h2>
+        <em>* - resets the canvas</em>
         <div class="input-group">
-            <label for="chaos-sides">Sides:<sup>*</sup>:</label>
-            <input type="number" id="chaos-sides" value="3" min="3" max="20">
+            <label for="chaos-sides">Sides<sup>*</sup>:</label>
+            <input type="number" id="chaos-sides" value="3" min="3">
         </div>
         <div class="input-group">
-            <label for="chaos-speed">Speed:</label>
-            <input type="number" id="chaos-speed" value="1" min="1">
-        </div>
-        <div class="input-group">
-            <label for="canvas-size">Canvas Size:<sup>*</sup>:</label>
+            <label for="canvas-size">Canvas Size<sup>*</sup>:</label>
             <input type="number" id="canvas-size" value="1000" min="100">
         </div>
         <div class="input-group">
-            <label for="point-size">Point Size:</label>
-            <input type="number" id="point-size" value="1" min="0.1" step="0.1">
-        </div>
-        <div class="input-group">
-            <label for="point-alpha">Point Alpha:<br>(0 - 1):</label>
-            <input type="number" id="point-alpha" value="1" min="0" max="1" step="0.01">
+            <label for="padding">Padding<sup>*</sup>:</label>
+            <input type="number" id="padding" value="10" min="0">
         </div>
         <div class="input-group">
             <label for="jump-distance">Jump Dist:<br>(0 - 1):</label>
-            <input type="number" id="jump-distance" value="0.5" min="0" max="1" step="0.01">
+            <input type="number" id="jump-distance" value="0.5" min="0" step="0.01">
         </div>
         <div class="input-group">
-            <label for="show-lines">Show Lines:<sup>*</sup>:</label>
+            <label for="chaos-new-pixels-threshold">New Pixel Threshold:</label>
+            <input type="number" id="chaos-new-pixels-threshold" value="1" min="1">
+        </div>
+        <div class="input-group">
+            <label for="show-lines">Show Lines<sup>*</sup>:</label>
             <div class="switch"><input type="checkbox" id="show-lines" checked></div>
         </div>
         <div class="input-group">
-            <label for="colored-switch">Colored:</label>
-            <div class="switch"><input type="checkbox" id="colored-switch"></div>
+            <label for="auto-stop">Auto Stop:</label>
+            <div class="switch"><input type="checkbox" id="auto-stop" checked></div>
+        </div>
+        <div class="input-group">
+            <label for="fg-color">Foreground Color:</label>
+            <input type="color" id="fg-color" checked>
+        </div>
+        <div class="input-group">
+            <label for="bg-color">Background Color:</label>
+            <input type="color" id="bg-color" checked>
         </div>
         <br>
-        <em>* - resets the canvas</em>
+        <p>New Pixel EMA: <span id="ema-value"></span></p>
+        <p>New to Fill Ratio: <span id="fill-ratio"></span></p>
     </div>
 </div>
-<script src="script_v10.js"></script>
+<script src="script_v11.js"></script>
 </body>
 </html>
