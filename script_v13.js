@@ -25,6 +25,8 @@ class ChaosGame {
             drawCircle: false,
             drawPolygon: false,
             symmetrical: true,
+            centerVertex: false,
+            midpointVertex: false,
             bgColor: 'black',
             fgColor: 'white',
 
@@ -174,15 +176,16 @@ class ChaosGame {
             });
             angle += 2 * Math.PI / this.settings.sides;
         }
-        // todo: add more vertices options (center, midpoint of sides)
-        // for (let i = 0; i < this.settings.sides; i++) {
-        //     let i2 = (i + 1) % this.settings.sides;
-        //     this.vertices.push({
-        //         x: (this.vertices[i].x + this.vertices[i2].x) / 2,
-        //         y: (this.vertices[i].y + this.vertices[i2].y) / 2,
-        //     });
-        // }
-        // this.vertices.push(this.center);
+        if (this.settings.midpointVertex) {
+            for (let i = 0; i < this.settings.sides; i++) {
+                let i2 = (i + 1) % this.settings.sides;
+                this.vertices.push({
+                    x: (this.vertices[i].x + this.vertices[i2].x) / 2,
+                    y: (this.vertices[i].y + this.vertices[i2].y) / 2,
+                });
+            }
+        }
+        if (this.settings.centerVertex) this.vertices.push(this.center);
         this.fullCtx.fillRect(0, 0, this.fullCanvas.width, this.fullCanvas.height);
         this.erase();
         this.currentPoint = this.getRandomPointInShape();
@@ -454,6 +457,8 @@ document.addEventListener('DOMContentLoaded', () => {
         threshold: document.getElementById('chaos-new-pixels-threshold'),
 
         // toggles
+        centerVertex: document.getElementById('center-vertex'),
+        midpointVertex: document.getElementById('midpoint-vertex'),
         linesToggle: document.getElementById('show-lines'),
         autoStop: document.getElementById('auto-stop'),
 
@@ -483,14 +488,12 @@ document.addEventListener('DOMContentLoaded', () => {
             chaosGame.reset();
         });
         elements.size.addEventListener('change', () => {
-            chaosGame.isStopped = true;
             document.getElementById('chaos-stop').disabled = true;
             document.getElementById('chaos-play').disabled = false;
             chaosGame.settings.canvasSize = parseInt(elements.size.value);
             chaosGame.reset();
         });
         elements.padding.addEventListener('change', () => {
-            chaosGame.isStopped = true;
             document.getElementById('chaos-stop').disabled = true;
             document.getElementById('chaos-play').disabled = false;
             chaosGame.settings.padding = parseInt(elements.padding.value);
@@ -508,6 +511,20 @@ document.addEventListener('DOMContentLoaded', () => {
             chaosGame.settings.stabilityNewPixelsThreshold = Math.max(1, elements.threshold.value);
         });
 
+        // toggles
+        elements.centerVertex.addEventListener('change', () => {
+            chaosGame.settings.centerVertex = elements.centerVertex.checked;
+            document.getElementById('chaos-stop').disabled = true;
+            document.getElementById('chaos-play').disabled = false;
+            chaosGame.reset();
+
+        });
+        elements.midpointVertex.addEventListener('change', () => {
+            chaosGame.settings.midpointVertex = elements.midpointVertex.checked;
+            document.getElementById('chaos-stop').disabled = true;
+            document.getElementById('chaos-play').disabled = false;
+            chaosGame.reset();
+        });
         elements.linesToggle.addEventListener('change', () => {
             chaosGame.settings.drawCircle = chaosGame.settings.drawPolygon = elements.linesToggle.checked;
             chaosGame.updateCanvas();
@@ -567,8 +584,12 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.gammaExponent.value = chaosGame.settings.gammaExponent;
         elements.threshold.value = chaosGame.settings.stabilityNewPixelsThreshold;
         elements.threshold.disabled = !chaosGame.settings.autoStop;
+
+        elements.centerVertex.checked = chaosGame.settings.centerVertex;
+        elements.midpointVertex.checked = chaosGame.settings.midpointVertex;
         elements.linesToggle.checked = chaosGame.settings.drawCircle;
         elements.autoStop.checked = chaosGame.settings.autoStop;
+
         elements.bgInput.value = chaosGame.showCtx.fillStyle;
         elements.fgInput.value = chaosGame.showCtx.strokeStyle;
     }

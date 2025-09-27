@@ -70,8 +70,16 @@
             <input type="number" id="chaos-new-pixels-threshold" value="1" min="1">
         </div>
         <div class="input-group">
+            <label for="center-vertex">Center:</label>
+            <div class="switch"><input type="checkbox" id="center-vertex"></div>
+        </div>
+        <div class="input-group">
+            <label for="midpoint-vertex">Midpoints:</label>
+            <div class="switch"><input type="checkbox" id="midpoint-vertex"></div>
+        </div>
+        <div class="input-group">
             <label for="show-lines">Show Lines<sup>*</sup>:</label>
-            <div class="switch"><input type="checkbox" id="show-lines" checked></div>
+            <div class="switch"><input type="checkbox" id="show-lines"></div>
         </div>
         <div class="input-group">
             <label for="auto-stop">Auto Stop:</label>
@@ -79,17 +87,17 @@
         </div>
         <div class="input-group">
             <label for="fg-color">Foreground Color:</label>
-            <input type="color" id="fg-color" checked>
+            <input type="color" id="fg-color">
         </div>
         <div class="input-group">
             <label for="bg-color">Background Color:</label>
-            <input type="color" id="bg-color" checked>
+            <input type="color" id="bg-color">
         </div>
         <br>
         <p>New Pixel EMA: <span id="ema-value"></span></p>
         <p>New to Fill Ratio: <span id="fill-ratio"></span></p>
     </div>
 </div>
-<script src="script_v12.js"></script>
+<script src="script_v13.js"></script>
 </body>
 </html>
