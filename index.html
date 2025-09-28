@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chaos Game</title>
-    <link rel="stylesheet" href="style_v7.css">
+    <link rel="stylesheet" href="style_v8.css">
     <link rel="icon" href="./assets/icon.png" type="image/png">
 </head>
 <body>
@@ -70,6 +70,14 @@
             <input type="number" id="chaos-new-pixels-threshold" value="1" min="1">
         </div>
         <div class="input-group">
+            <label for="restriction">Restriction:</label>
+            <select id="restriction">
+                <option selected value="none">None</option>
+                <option value="no-repeat">No repeat</option>
+                <option value="no-neighbor">No neighbor</option>
+            </select>
+        </div>
+        <div class="input-group">
             <label for="center-vertex">Center<sup>*</sup>:</label>
             <div class="switch"><input type="checkbox" id="center-vertex"></div>
         </div>
@@ -98,6 +106,6 @@
         <p>New to Fill Ratio: <span id="fill-ratio"></span></p>
     </div>
 </div>
-<script src="script_v13.js"></script>
+<script src="script_v14.js"></script>
 </body>
 </html>

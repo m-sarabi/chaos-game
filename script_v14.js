@@ -29,6 +29,7 @@ class ChaosGame {
             midpointVertex: false,
             bgColor: 'black',
             fgColor: 'white',
+            restriction: null,
 
             stabilityNewPixelsThreshold: 20.0,
             stabilityCheckInterval: 1_000_000,
@@ -46,6 +47,11 @@ class ChaosGame {
         this.iterations = 0;
         this.updateMultiplier = 1;
 
+        // this.availableRestrictions = [
+        //     'no-repeat',
+        //     'no-neighbor',
+        // ];
+
         this.bgColor = null;
         this.fgColor = null;
 
@@ -59,8 +65,7 @@ class ChaosGame {
         this.emaAlpha = 0.2;
         this.stabilityWindow = 10;
 
-        // this.prevIndex = null;
-        // this.preverIndex = null;
+        this.prevIndex = [];
         // todo: add restricted rules
 
         this.listeners = {};
@@ -162,6 +167,7 @@ class ChaosGame {
 
         const x = (1 - Math.sqrt(r1)) * v1.x + Math.sqrt(r1) * (1 - r2) * v2.x + Math.sqrt(r1) * r2 * v3.x;
         const y = (1 - Math.sqrt(r1)) * v1.y + Math.sqrt(r1) * (1 - r2) * v2.y + Math.sqrt(r1) * r2 * v3.y;
+        console.log(x, y);
 
         return {x, y};
     }
@@ -177,31 +183,70 @@ class ChaosGame {
             angle += 2 * Math.PI / this.settings.sides;
         }
         if (this.settings.midpointVertex) {
-            for (let i = 0; i < this.settings.sides; i++) {
+            const midpoints = [];
+            for (let i = 0; i < this.vertices.length; i++) {
                 let i2 = (i + 1) % this.settings.sides;
-                this.vertices.push({
+                midpoints.push({
                     x: (this.vertices[i].x + this.vertices[i2].x) / 2,
                     y: (this.vertices[i].y + this.vertices[i2].y) / 2,
                 });
             }
+            for (let i = 0; i < midpoints.length; i++) {
+                this.vertices.splice(2 * i + 1, 0, midpoints[i]);
+            }
         }
         if (this.settings.centerVertex) this.vertices.push(this.center);
+        this.buildRestrictions();
         this.fullCtx.fillRect(0, 0, this.fullCanvas.width, this.fullCanvas.height);
         this.erase();
         this.currentPoint = this.getRandomPointInShape();
         this.burnIn();
     }
 
+    buildRestrictions() {
+        const sides = this.settings.midpointVertex ? this.settings.sides * 2 : this.settings.sides;
+        this.allowedMoves = [];
+
+        for (let i = 0; i < this.vertices.length; i++) {
+            let allowed = [];
+
+            if (this.settings.restriction === 'no-repeat') {
+                // All except self
+                for (let j = 0; j < this.vertices.length; j++) {
+                    if (j !== i) allowed.push(j);
+                }
+            } else if (this.settings.restriction === 'no-neighbor') {
+                // All except left/right neighbors
+                const left = (i - 1 + sides) % sides;
+                const right = (i + 1) % sides;
+                for (let j = 0; j < this.vertices.length; j++) {
+                    if (i >= sides || (j !== left && j !== right)) allowed.push(j);
+                }
+            } else {
+                // No restriction → all valid
+                allowed = Array.from({length: this.vertices.length}, (_, j) => j);
+            }
+
+            this.allowedMoves[i] = allowed;
+        }
+    }
+
+
     updateCurrentPoint() {
-        const randomVertex = this.vertices[Math.floor(Math.random() * this.vertices.length)];
-        // const sides = this.settings.sides;
-        // let randomIndex;
-        // do {
-        //     randomIndex = Math.floor(Math.random() * this.vertices.length);
-        // } while (this.preverIndex === this.prevIndex && (randomIndex === (this.prevIndex - 1 + sides) % sides || randomIndex === (this.prevIndex + 1) % sides));
-        // let randomVertex = this.vertices[randomIndex];
-        // this.preverIndex = this.prevIndex;
-        // this.prevIndex = randomIndex;
+        let currentIndex;
+
+        if (!this.prevIndex.length) {
+            currentIndex = Math.floor(Math.random() * this.vertices.length);
+        } else {
+            const allowed = this.allowedMoves[this.prevIndex.at(-1)];
+            currentIndex = allowed[Math.floor(Math.random() * allowed.length)];
+        }
+
+        // keep track of up to 10 previous indexes
+        this.prevIndex.push(currentIndex);
+        if (this.prevIndex.length > 10) this.prevIndex.shift();
+
+        const randomVertex = this.vertices[currentIndex];
         this.currentPoint.x = this.currentPoint.x + (randomVertex.x - this.currentPoint.x) * this.settings.jumpDistance;
         this.currentPoint.y = this.currentPoint.y + (randomVertex.y - this.currentPoint.y) * this.settings.jumpDistance;
     }
@@ -318,9 +363,12 @@ class ChaosGame {
     drawPolygon() {
         this.fullCtx.beginPath();
         this.fullCtx.moveTo(this.vertices[0].x, this.vertices[0].y);
-        for (let i = 0; i < this.settings.sides; i++) {
+        const indexes = this.settings.midpointVertex ?
+            Array.from({length: this.settings.sides}, (_, i) => 2 * i) :
+            Array.from({length: this.settings.sides}, (_, i) => i);
+        for (let i = 0; i < indexes.length; i++) {
             const index = (i + 1) % this.settings.sides;
-            this.fullCtx.lineTo(this.vertices[index].x, this.vertices[index].y);
+            this.fullCtx.lineTo(this.vertices[indexes[index]].x, this.vertices[indexes[index]].y);
         }
         this.fullCtx.stroke();
     }
@@ -415,6 +463,7 @@ class ChaosGame {
         this.imageData = this.fullCtx.createImageData(this.settings.canvasSize, this.settings.canvasSize);
         this.pixelData = new Uint32Array(this.imageData.data.buffer);
         this.pixelData.fill((0xFF << 24) | (this.bgColor.b << 16) | (this.bgColor.g << 8) | this.bgColor.r);
+        this.prevIndex.length = 0;
 
         this.iterations = 0;
         this.stabilityCounter = 0;
@@ -455,6 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
         jumpDistance: document.getElementById('jump-distance'),
         gammaExponent: document.getElementById('gamma-exponent'),
         threshold: document.getElementById('chaos-new-pixels-threshold'),
+        restriction: document.getElementById('restriction'),
 
         // toggles
         centerVertex: document.getElementById('center-vertex'),
@@ -482,22 +532,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // inputs
         elements.sides.addEventListener('change', () => {
-            document.getElementById('chaos-stop').disabled = true;
-            document.getElementById('chaos-play').disabled = false;
             chaosGame.settings.sides = parseInt(elements.sides.value);
-            chaosGame.reset();
+            reset();
         });
         elements.size.addEventListener('change', () => {
-            document.getElementById('chaos-stop').disabled = true;
-            document.getElementById('chaos-play').disabled = false;
             chaosGame.settings.canvasSize = parseInt(elements.size.value);
-            chaosGame.reset();
+            reset();
         });
         elements.padding.addEventListener('change', () => {
-            document.getElementById('chaos-stop').disabled = true;
-            document.getElementById('chaos-play').disabled = false;
             chaosGame.settings.padding = parseInt(elements.padding.value);
-            chaosGame.reset();
+            reset();
         });
         elements.jumpDistance.addEventListener('change', () => {
             chaosGame.settings.jumpDistance = elements.jumpDistance.value;
@@ -510,20 +554,21 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.threshold.addEventListener('change', () => {
             chaosGame.settings.stabilityNewPixelsThreshold = Math.max(1, elements.threshold.value);
         });
+        elements.restriction.addEventListener('change', () => {
+            const restrictionValue = elements.restriction.value;
+            chaosGame.settings.restriction = restrictionValue === 'none' ? null : restrictionValue;
+            reset();
+        });
 
         // toggles
         elements.centerVertex.addEventListener('change', () => {
             chaosGame.settings.centerVertex = elements.centerVertex.checked;
-            document.getElementById('chaos-stop').disabled = true;
-            document.getElementById('chaos-play').disabled = false;
-            chaosGame.reset();
+            reset();
 
         });
         elements.midpointVertex.addEventListener('change', () => {
             chaosGame.settings.midpointVertex = elements.midpointVertex.checked;
-            document.getElementById('chaos-stop').disabled = true;
-            document.getElementById('chaos-play').disabled = false;
-            chaosGame.reset();
+            reset();
         });
         elements.linesToggle.addEventListener('change', () => {
             chaosGame.settings.drawCircle = chaosGame.settings.drawPolygon = elements.linesToggle.checked;
@@ -584,6 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.gammaExponent.value = chaosGame.settings.gammaExponent;
         elements.threshold.value = chaosGame.settings.stabilityNewPixelsThreshold;
         elements.threshold.disabled = !chaosGame.settings.autoStop;
+        elements.restriction.value = chaosGame.settings.restriction === null ? 'none' : chaosGame.settings.restriction;
 
         elements.centerVertex.checked = chaosGame.settings.centerVertex;
         elements.midpointVertex.checked = chaosGame.settings.midpointVertex;
@@ -605,6 +651,12 @@ document.addEventListener('DOMContentLoaded', () => {
         optionsOpen = !optionsOpen;
     }
 
+    function reset() {
+        document.getElementById('chaos-stop').disabled = true;
+        document.getElementById('chaos-play').disabled = false;
+        chaosGame.reset();
+    }
+
     let oldWidth = document.documentElement.clientWidth;
     let optionsOpen = false;
 
@@ -617,7 +669,13 @@ document.addEventListener('DOMContentLoaded', () => {
     initEvents();
 
     resizeShowCanvas();
-    const chaosGame = new ChaosGame(elements.showCanvas, {symmetrical: false});
+    const chaosGame = new ChaosGame(elements.showCanvas, {
+        symmetrical: false,
+        restriction:
+        // null,
+        // 'no-repeat',
+            'no-neighbor',
+    });
     chaosGame.init();
     chaosGame.on('stabilityCheck', (data) => {
         elements.emaSpan.textContent = data.newPixelsEma.toFixed(1);
