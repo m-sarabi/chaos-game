@@ -552,7 +552,7 @@ document.addEventListener('DOMContentLoaded', () => {
             chaosGame.updateCanvas();
         });
         elements.threshold.addEventListener('change', () => {
-            chaosGame.settings.stabilityNewPixelsThreshold = Math.max(1, elements.threshold.value);
+            chaosGame.settings.stabilityNewPixelsThreshold = Math.max(0, elements.threshold.value);
         });
         elements.restriction.addEventListener('change', () => {
             const restrictionValue = elements.restriction.value;
