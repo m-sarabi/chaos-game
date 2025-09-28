@@ -341,6 +341,9 @@ class ChaosGame {
             this.iterations += this.settings.symmetrical ? this.settings.batchSize * this.settings.sides * 2 : this.settings.batchSize;
 
             if (this.settings.autoStop && this.iterations >= this.settings.stabilityCheckInterval && this.checkStability()) {
+                this.emit('finish', {
+                    time: performance.now() - this.startTime,
+                });
                 this.stop();
                 return;
             }
