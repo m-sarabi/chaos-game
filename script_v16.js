@@ -86,7 +86,6 @@ class ChaosGame {
         this.pixelData.fill((0xFF << 24) | (this.bgColor.b << 16) | (this.bgColor.g << 8) | this.bgColor.r);
         this.preDraw();
         this.erase();
-
     }
 
     reset() {
@@ -213,7 +212,7 @@ class ChaosGame {
                 for (let j = 0; j < this.vertices.length; j++) {
                     if (j !== i) allowed.push(j);
                 }
-            } else if (this.settings.restriction === 'no-neighbor') {
+            } else if (['no-neighbor', 'no-neighbor-after-repeat'].includes(this.settings.restriction)) {
                 // All except left/right neighbors
                 const left = (i - 1 + sides) % sides;
                 const right = (i + 1) % sides;
@@ -229,11 +228,14 @@ class ChaosGame {
         }
     }
 
-
     updateCurrentPoint() {
         let currentIndex;
 
-        if (!this.prevIndex.length) {
+        if (
+            !this.prevIndex.length ||
+            this.settings.restriction === 'no-neighbor-after-repeat' &&
+            this.prevIndex.length < 2 || this.prevIndex.at(-1) !== this.prevIndex.at(-2)
+        ) {
             currentIndex = Math.floor(Math.random() * this.vertices.length);
         } else {
             const allowed = this.allowedMoves[this.prevIndex.at(-1)];
