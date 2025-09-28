@@ -87,11 +87,14 @@ canvas {
 }
 
 .input-group input {
+    width: 120px;
+}
+
+.input-group input[type=color] {
     width: 80px;
 }
 
-input[type="number"] {
-    padding: 8px;
+input[type="number"], input[type="color"] {
     border: 1px solid #444;
     border-radius: 4px;
     background-color: #2b2b2b;
@@ -99,10 +102,15 @@ input[type="number"] {
     font-size: 1em;
 }
 
+input[type="number"] {
+    padding: 8px;
+}
+
 select {
     padding: 8px 20px 8px 8px;
     border: 1px solid #444;
     border-radius: 4px;
+    width: 120px;
     background-color: #2b2b2b;
     color: #e0e0e0;
     font-size: 1em;
