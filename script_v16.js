@@ -232,9 +232,9 @@ class ChaosGame {
         let currentIndex;
 
         if (
-            !this.prevIndex.length ||
-            this.settings.restriction === 'no-neighbor-after-repeat' &&
-            this.prevIndex.length < 2 || this.prevIndex.at(-1) !== this.prevIndex.at(-2)
+            this.prevIndex.length === 0 ||
+            (this.settings.restriction === 'no-neighbor-after-repeat' &&
+            (this.prevIndex.length < 2 || this.prevIndex.at(-1) !== this.prevIndex.at(-2)))
         ) {
             currentIndex = Math.floor(Math.random() * this.vertices.length);
         } else {
