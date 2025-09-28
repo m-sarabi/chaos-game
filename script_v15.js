@@ -66,7 +66,6 @@ class ChaosGame {
         this.stabilityWindow = 10;
 
         this.prevIndex = [];
-        // todo: add restricted rules
 
         this.listeners = {};
 
@@ -167,7 +166,6 @@ class ChaosGame {
 
         const x = (1 - Math.sqrt(r1)) * v1.x + Math.sqrt(r1) * (1 - r2) * v2.x + Math.sqrt(r1) * r2 * v3.x;
         const y = (1 - Math.sqrt(r1)) * v1.y + Math.sqrt(r1) * (1 - r2) * v2.y + Math.sqrt(r1) * r2 * v3.y;
-        console.log(x, y);
 
         return {x, y};
     }
@@ -409,7 +407,6 @@ class ChaosGame {
         if (quietByNew) {
             this.stabilityCounter++;
             if (this.stabilityCounter >= this.stabilityWindow) {
-                console.log('Stable — stopping.');
                 return true;
             }
         } else {
@@ -454,7 +451,6 @@ class ChaosGame {
         this.rescaleAll();
         this.updateCanvas();
         console.log('Total time:', performance.now() - this.startTime);
-        console.log(this.filledPixels);
     }
 
     erase() {
@@ -597,7 +593,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         elements.overlay.addEventListener('click', (event) => {
-            console.log(event.target);
             if (event.target === elements.overlay) {
                 elements.overlay.classList.add('disabled');
                 toggleOptions();
@@ -671,10 +666,6 @@ document.addEventListener('DOMContentLoaded', () => {
     resizeShowCanvas();
     const chaosGame = new ChaosGame(elements.showCanvas, {
         symmetrical: false,
-        restriction:
-        // null,
-        // 'no-repeat',
-            'no-neighbor',
     });
     chaosGame.init();
     chaosGame.on('stabilityCheck', (data) => {
