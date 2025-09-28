@@ -207,7 +207,7 @@ class ChaosGame {
         for (let i = 0; i < this.vertices.length; i++) {
             let allowed = [];
 
-            if (this.settings.restriction === 'no-repeat') {
+            if (['no-repeat', 'no-double-repeat'].includes(this.settings.restriction)) {
                 // All except self
                 for (let j = 0; j < this.vertices.length; j++) {
                     if (j !== i) allowed.push(j);
@@ -233,7 +233,7 @@ class ChaosGame {
 
         if (
             this.prevIndex.length === 0 ||
-            (this.settings.restriction === 'no-neighbor-after-repeat' &&
+            (['no-neighbor-after-repeat','no-double-repeat'].includes(this.settings.restriction) &&
             (this.prevIndex.length < 2 || this.prevIndex.at(-1) !== this.prevIndex.at(-2)))
         ) {
             currentIndex = Math.floor(Math.random() * this.vertices.length);
