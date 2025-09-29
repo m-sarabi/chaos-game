@@ -58,6 +58,7 @@ canvas {
     gap: 10px;
     padding: 30px;
     width: fit-content;
+    flex-shrink: 0;
     overflow-y: auto;
     max-height: calc(100vh - 40px);
 }
@@ -275,6 +276,7 @@ button:disabled {
     }
 
     #show-options {
+        display: flex;
         position: absolute;
         z-index: 101;
         top: 5px;

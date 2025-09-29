@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chaos Game</title>
-    <link rel="stylesheet" href="style_v9.css">
+    <link rel="stylesheet" href="style_v10.css">
     <link rel="icon" href="./assets/icon.png" type="image/png">
+    <script src="ChaosGame_v1.js"></script>
 </head>
 <body>
 <button id="show-options">
@@ -63,7 +64,7 @@
         </div>
         <div class="input-group">
             <label for="gamma-exponent">Gamma Exponent:</label>
-            <input type="number" id="gamma-exponent" value="0.5" step="0.01">
+            <input type="number" id="gamma-exponent" value="3" step="0.1">
         </div>
         <div class="input-group">
             <label for="chaos-new-pixels-threshold">New Pixel Threshold:</label>
@@ -98,17 +99,18 @@
         </div>
         <div class="input-group">
             <label for="fg-color">Foreground Color:</label>
-            <input type="color" id="fg-color">
+            <input type="color" id="fg-color" value="#FFFFFF">
         </div>
         <div class="input-group">
             <label for="bg-color">Background Color:</label>
-            <input type="color" id="bg-color">
+            <input type="color" id="bg-color" value="#000000">
+            <div class="switch"><input type="checkbox" id="solid-bg" checked></div>
         </div>
         <br>
         <p>New Pixel EMA: <span id="ema-value"></span></p>
         <p>New to Fill Ratio: <span id="fill-ratio"></span></p>
     </div>
 </div>
-<script src="script_v19.js"></script>
+<script src="script_v20.js"></script>
 </body>
 </html>
