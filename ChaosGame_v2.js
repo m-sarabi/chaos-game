@@ -11,7 +11,7 @@ class ChaosGame {
         this.listeners = {};
 
         // The class creates and manages its own worker
-        this.worker = new Worker('worker.js');
+        this.worker = new Worker('worker_v1.js');
         this.worker.onmessage = this.handleWorkerMessage.bind(this);
 
         this.init();
