@@ -72,6 +72,8 @@ function calculatePixelValue(val) {
         // When the background is transparent, 'val' controls the alpha channel.
         // The color is always the foreground color.
         const alpha = lerp(0, 255, val);
+        // The pixelData buffer is a Uint32Array, so we pack RGBA into a single 32-bit integer.
+        // The format is 0xAABBGGRR on little-endian systems.
         return (alpha << 24) | (fgColor.b << 16) | (fgColor.g << 8) | fgColor.r;
     } else {
         // When the background is solid, interpolate RGB and use full alpha.
@@ -490,9 +492,21 @@ self.onmessage = (e) => {
             break;
         case 'updateSetting':
             state.settings[key] = value;
+
+            const geometryKeys = ['sides', 'padding', 'midpointVertex', 'centerVertex'];
+            const colorKeys = ['bgColor', 'fgColor', 'solidBg', 'gammaExponent'];
+            const cosmeticKeys = ['drawCircle', 'drawPolygon'];
+
             let needsRender = false;
-            if (['bgColor', 'fgColor', 'solidBg'].includes(key)) {
-                updateColors();
+
+            if (geometryKeys.includes(key)) {
+                // These require a full reset of the simulation
+                stop();
+                setup(state.settings);
+                renderFrame();
+
+            } else if (colorKeys.includes(key)) {
+                    updateColors();
                 if (state.settings.solidBg) {
                     const bg32 = (0xFF << 24) | (state.bgColor.b << 16) | (state.bgColor.g << 8) | state.bgColor.r;
                     state.pixelData.fill(bg32);
@@ -500,7 +514,7 @@ self.onmessage = (e) => {
                     state.pixelData.fill(0);
                 }
                 needsRender = true;
-            } else if (['gammaExponent', 'drawCircle', 'drawPolygon'].includes(key)) {
+            } else if (cosmeticKeys.includes(key)) {
                 needsRender = true;
             } else if (key === 'liveRendering' && value === true) {
                 needsRender = true;

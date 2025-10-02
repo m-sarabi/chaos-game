@@ -56,7 +56,11 @@ class ChaosGame {
                 link.download = `chaos-game-${time}-${this.settings.jumpDistance}.png`;
                 link.click();
                 URL.revokeObjectURL(imageURL);
-                this.emit('download', {})
+                this.emit('download', {});
+                break;
+            default:
+                console.warn(`Unknown worker message type: ${type}`);
+                break;
         }
     }
 
@@ -122,6 +126,6 @@ class ChaosGame {
     }
 
     download() {
-        this.worker.postMessage({ type: 'getBlob' });
+        this.worker.postMessage({type: 'getBlob'});
     }
 }
