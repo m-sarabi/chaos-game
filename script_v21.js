@@ -95,24 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.playButton.disabled = false;
         elements.stopButton.disabled = true;
         console.log(data.time);
-        // chaosGame.download();
-        //
-        // if (chaosGame.settings.jumpDistance < 1) {
-        //     const newJump = Number(chaosGame.settings.jumpDistance) + 0.001;
-        //     elements.jumpDistance.value = newJump.toFixed(4);
-        //     chaosGame.updateSetting('jumpDistance', newJump);
-        //     resetAndPlay();
-        // }
     });
-
-    // function resetAndPlay() {
-    //     chaosGame.reset();
-    //     elements.playButton.disabled = false;
-    //     elements.stopButton.disabled = true;
-    //     requestAnimationFrame(() => {
-    //         elements.playButton.click();
-    //     });
-    // }
 
     // --- Wire up DOM events to ChaosGame methods ---
     elements.playButton.addEventListener('click', () => {

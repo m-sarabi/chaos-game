@@ -52,6 +52,7 @@ class ChaosGame {
                 link.download = `chaos-game-${time}-${this.settings.jumpDistance}.png`;
                 link.click();
                 URL.revokeObjectURL(imageURL);
+                this.emit('download', {})
         }
     }
 
