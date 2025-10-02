@@ -7,7 +7,6 @@ let state = {
     center: {x: 0, y: 0},
     radius: 0,
     imageMatrix: null, // Float32Array for raw hit counts
-    allowedMoves: [],
     pixelData: null, // Uint32Array for color data
     imageDataBuffer: null,
     maxValue: 1,
@@ -164,30 +163,8 @@ function preDraw() {
     }
     if (settings.centerVertex) state.vertices.push(center);
 
-    buildRestrictions();
     state.currentPoint = getRandomPointInShape();
     burnIn();
-}
-
-function buildRestrictions() {
-    const {settings, vertices} = state;
-    const sides = settings.midpointVertex ? settings.sides * 2 : settings.sides;
-    state.allowedMoves = [];
-
-    for (let i = 0; i < vertices.length; i++) {
-        let allowed = [];
-        if (['no-repeat', 'no-double-repeat', 'no-return'].includes(settings.restriction)) {
-            allowed = vertices.map((_, j) => j).filter(j => j !== i);
-        } else if (['no-neighbor', 'no-neighbor-after-repeat'].includes(settings.restriction)) {
-            const left = (i - 1 + sides) % sides;
-            const right = (i + 1) % sides;
-            // The center vertex (i >= sides) has no neighbors, so all moves are allowed.
-            allowed = vertices.map((_, j) => j).filter(j => i >= sides || (j !== left && j !== right));
-        } else {
-            allowed = Array.from({length: vertices.length}, (_, j) => j);
-        }
-        state.allowedMoves[i] = allowed;
-    }
 }
 
 function getRandomPointInShape() {
@@ -210,25 +187,90 @@ function burnIn() {
     }
 }
 
+/**
+ * Selects the next vertex based on the current restriction rule and history,
+ * then updates the current point's position.
+ */
 function updateCurrentPoint() {
-    const {settings, prevIndex, vertices, allowedMoves} = state;
-    let currentIndex;
+    const {settings, vertices, prevIndex} = state;
 
-    if (
-        prevIndex.length === 0 ||
-        (settings.restriction === 'no-return' && prevIndex.length < 2) ||
-        (['no-neighbor-after-repeat', 'no-double-repeat'].includes(settings.restriction) &&
-            (prevIndex.length < 2 || prevIndex.at(-1) !== prevIndex.at(-2)))
-    ) {
-        currentIndex = Math.floor(Math.random() * vertices.length);
-    } else {
-        const i = settings.restriction === 'no-return' ? -2 : -1;
-        const allowed = allowedMoves[prevIndex.at(i)];
-        currentIndex = allowed[Math.floor(Math.random() * allowed.length)];
+    // Get the last two chosen vertex indices.
+    const lastIndex = prevIndex.at(-1); // is undefined if prevIndex is empty
+    const prevLastIndex = prevIndex.at(-2); // is undefined if not enough history
+
+    const forbiddenChoices = new Set();
+
+    // Determine which vertices are forbidden based on the rule and history.
+    switch (settings.restriction) {
+        case 'no-repeat':
+            // The current vertex cannot be the same as the previous one.
+            if (lastIndex !== undefined) {
+                forbiddenChoices.add(lastIndex);
+            }
+            break;
+
+        case 'no-double-repeat':
+            // The two previous vertices and the current one cannot be the same.
+            if (lastIndex !== undefined && lastIndex === prevLastIndex) {
+                forbiddenChoices.add(lastIndex);
+            }
+            break;
+
+        case 'no-return':
+            // The current vertex cannot be the same as the one before the previous one.
+            if (prevLastIndex !== undefined) {
+                forbiddenChoices.add(prevLastIndex);
+            }
+            break;
+
+        case 'no-neighbor': {
+            // The current vertex cannot be a neighbor of the previous one.
+            // This applies only to the main polygon vertices, not the center vertex.
+            const sides = settings.midpointVertex ? settings.sides * 2 : settings.sides;
+            if (lastIndex !== undefined && lastIndex < sides) { // lastIndex < sides ensures it's not the center vertex
+                const leftNeighbor = (lastIndex - 1 + sides) % sides;
+                const rightNeighbor = (lastIndex + 1) % sides;
+                forbiddenChoices.add(leftNeighbor);
+                forbiddenChoices.add(rightNeighbor);
+            }
+            break;
+        }
+
+        case 'no-neighbor-after-repeat': {
+            // If the last two vertices were the same, the next cannot be a neighbor.
+            const sides = settings.midpointVertex ? settings.sides * 2 : settings.sides;
+            if (lastIndex !== undefined && lastIndex === prevLastIndex && lastIndex < sides) {
+                const leftNeighbor = (lastIndex - 1 + sides) % sides;
+                const rightNeighbor = (lastIndex + 1) % sides;
+                forbiddenChoices.add(leftNeighbor);
+                forbiddenChoices.add(rightNeighbor);
+            }
+            break;
+        }
+        // 'null' (default case): No restrictions are applied.
+        default:
+            break;
     }
 
+    // Create the list of allowed choices by filtering out forbidden ones.
+    const allowedChoices = [];
+    for (let i = 0; i < vertices.length; i++) {
+        if (!forbiddenChoices.has(i)) {
+            allowedChoices.push(i);
+        }
+    }
+
+    // Use the filtered list, but fall back to all vertices if the list is empty.
+    const finalChoices = allowedChoices.length > 0 ? allowedChoices : Array.from({length: vertices.length}, (_, i) => i);
+
+    // Select a random vertex from the allowed choices.
+    const currentIndex = finalChoices[Math.floor(Math.random() * finalChoices.length)];
+
+    // Update history and the current point's coordinates.
     prevIndex.push(currentIndex);
-    if (prevIndex.length > 10) prevIndex.shift();
+    if (prevIndex.length > 10) {
+        prevIndex.shift();
+    }
 
     const randomVertex = vertices[currentIndex];
     state.currentPoint.x += (randomVertex.x - state.currentPoint.x) * settings.jumpDistance;
@@ -259,7 +301,7 @@ function updateMatrix() {
         const x = Math.round(point.x);
         const y = Math.round(point.y);
 
-        // if (x < 0 || x >= settings.canvasSize || y < 0 || y >= settings.canvasSize) continue;
+        if (x < 0 || x >= settings.canvasSize || y < 0 || y >= settings.canvasSize) continue;
 
         const index = y * settings.canvasSize + x;
 
@@ -285,17 +327,6 @@ function updatePixelDataFromMatrix() {
         }
     }
 }
-
-// function rescaleAll() {
-//     const logMax = Math.log(1 + maxValue);
-//
-//     for (let i = 0; i < imageMatrix.length; i++) {
-//         if (imageMatrix[i] >= 0) {
-//             const normalizedVal = normalizeValue(imageMatrix[i], logMax);
-//             pixelData[i] = calculatePixelValue(normalizedVal);
-//         }
-//     }
-// }
 
 function erase() {
     if (!ctx) return;
@@ -346,10 +377,8 @@ function renderCanvas() {
     drawLines();
 }
 
-// FIX 1: Create a new function for preparing the canvas without transferring the bitmap.
 /**
  * Updates the pixel data from the raw matrix and draws it to the offscreen canvas.
- * This is the non-destructive part of the rendering process.
  */
 function prepareCanvasForOutput() {
     updatePixelDataFromMatrix();
@@ -358,7 +387,7 @@ function prepareCanvasForOutput() {
 
 
 function renderFrame() {
-    prepareCanvasForOutput(); // Use the new helper function
+    prepareCanvasForOutput();
     const imageBitmap = offscreenCanvas.transferToImageBitmap();
     self.postMessage({type: 'render', data: {imageBitmap}}, [imageBitmap]);
 }
@@ -465,10 +494,10 @@ self.onmessage = (e) => {
             if (['bgColor', 'fgColor', 'solidBg'].includes(key)) {
                 updateColors();
                 if (state.settings.solidBg) {
-                     const bg32 = (0xFF << 24) | (state.bgColor.b << 16) | (state.bgColor.g << 8) | state.bgColor.r;
-                     state.pixelData.fill(bg32);
+                    const bg32 = (0xFF << 24) | (state.bgColor.b << 16) | (state.bgColor.g << 8) | state.bgColor.r;
+                    state.pixelData.fill(bg32);
                 } else {
-                     state.pixelData.fill(0);
+                    state.pixelData.fill(0);
                 }
                 needsRender = true;
             } else if (['gammaExponent', 'drawCircle', 'drawPolygon'].includes(key)) {

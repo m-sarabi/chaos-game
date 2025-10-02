@@ -12,7 +12,7 @@ class ChaosGame {
         this.showCtx = this.showCanvas ? this.showCanvas.getContext('2d') : null;
 
         // The class creates and manages its own worker
-        this.worker = new Worker('worker_v3.js');
+        this.worker = new Worker('worker.js');
         this.worker.onmessage = this.handleWorkerMessage.bind(this);
 
         this.init();
