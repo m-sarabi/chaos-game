@@ -195,127 +195,57 @@ function burnIn() {
  */
 function updateCurrentPoint() {
     const {settings, vertices, prevIndex} = state;
+    const numVertices = vertices.length;
 
-    // Get the last two chosen vertex indices.
-    const lastIndex = prevIndex.at(-1); // is undefined if prevIndex is empty
-    const prevLastIndex = prevIndex.at(-2); // is undefined if not enough history
+    const lastIndex = prevIndex.at(-1);
+    const prevLastIndex = prevIndex.at(-2);
 
-    const forbiddenChoices = new Set();
+    let currentIndex;
+    let isForbidden = true;
 
-    // Determine which vertices are forbidden based on the rule and history.
-    switch (settings.restriction) {
-        case 'no-repeat':
-            // The current vertex cannot be the same as the previous one.
-            if (lastIndex !== undefined) {
-                forbiddenChoices.add(lastIndex);
+    // "Select and Retry" loop. In almost all cases, this will only run once.
+    while (isForbidden) {
+        currentIndex = Math.floor(Math.random() * numVertices);
+        isForbidden = false;
+
+        switch (settings.restriction) {
+            case 'no-repeat':
+                if (currentIndex === lastIndex) isForbidden = true;
+                break;
+            case 'no-double-repeat':
+                if (currentIndex === lastIndex && currentIndex === prevLastIndex) isForbidden = true;
+                break;
+            case 'no-return':
+                if (currentIndex === prevLastIndex) isForbidden = true;
+                break;
+            case 'no-neighbor': {
+                const sides = settings.midpointVertex ? settings.sides * 2 : settings.sides;
+                if (lastIndex !== undefined && lastIndex < sides && currentIndex < sides) {
+                    const diff = Math.abs(currentIndex - lastIndex);
+                    if (diff === 1 || diff === sides - 1) isForbidden = true;
+                }
+                break;
             }
-            break;
-
-        case 'no-double-repeat':
-            // The two previous vertices and the current one cannot be the same.
-            if (lastIndex !== undefined && lastIndex === prevLastIndex) {
-                forbiddenChoices.add(lastIndex);
+            case 'no-neighbor-after-repeat': {
+                const sides = settings.midpointVertex ? settings.sides * 2 : settings.sides;
+                if (lastIndex !== undefined && lastIndex === prevLastIndex && lastIndex < sides && currentIndex < sides) {
+                     const diff = Math.abs(currentIndex - lastIndex);
+                    if (diff === 1 || diff === sides - 1) isForbidden = true;
+                }
+                break;
             }
-            break;
-
-        case 'no-return':
-            // The current vertex cannot be the same as the one before the previous one.
-            if (prevLastIndex !== undefined) {
-                forbiddenChoices.add(prevLastIndex);
-            }
-            break;
-
-        case 'no-neighbor': {
-            // The current vertex cannot be a neighbor of the previous one.
-            // This applies only to the main polygon vertices, not the center vertex.
-            const sides = settings.midpointVertex ? settings.sides * 2 : settings.sides;
-            if (lastIndex !== undefined && lastIndex < sides) { // lastIndex < sides ensures it's not the center vertex
-                const leftNeighbor = (lastIndex - 1 + sides) % sides;
-                const rightNeighbor = (lastIndex + 1) % sides;
-                forbiddenChoices.add(leftNeighbor);
-                forbiddenChoices.add(rightNeighbor);
-            }
-            break;
-        }
-
-        case 'no-neighbor-after-repeat': {
-            // If the last two vertices were the same, the next cannot be a neighbor.
-            const sides = settings.midpointVertex ? settings.sides * 2 : settings.sides;
-            if (lastIndex !== undefined && lastIndex === prevLastIndex && lastIndex < sides) {
-                const leftNeighbor = (lastIndex - 1 + sides) % sides;
-                const rightNeighbor = (lastIndex + 1) % sides;
-                forbiddenChoices.add(leftNeighbor);
-                forbiddenChoices.add(rightNeighbor);
-            }
-            break;
-        }
-        // 'null' (default case): No restrictions are applied.
-        default:
-            break;
-    }
-
-    // Create the list of allowed choices by filtering out forbidden ones.
-    const allowedChoices = [];
-    for (let i = 0; i < vertices.length; i++) {
-        if (!forbiddenChoices.has(i)) {
-            allowedChoices.push(i);
         }
     }
 
-    // Use the filtered list, but fall back to all vertices if the list is empty.
-    const finalChoices = allowedChoices.length > 0 ? allowedChoices : Array.from({length: vertices.length}, (_, i) => i);
-
-    // Select a random vertex from the allowed choices.
-    const currentIndex = finalChoices[Math.floor(Math.random() * finalChoices.length)];
-
-    // Update history and the current point's coordinates.
     prevIndex.push(currentIndex);
     if (prevIndex.length > 10) {
         prevIndex.shift();
     }
 
     const randomVertex = vertices[currentIndex];
-    state.currentPoint.x += (randomVertex.x - state.currentPoint.x) * settings.jumpDistance;
-    state.currentPoint.y += (randomVertex.y - state.currentPoint.y) * settings.jumpDistance;
-}
-
-function updateMatrix() {
-    updateCurrentPoint();
-
-    const {settings, currentPoint, center, cosAngles, sinAngles, imageMatrix} = state;
-
-    const rotatePoint = (x, y, cos, sin) => ({
-        x: (x - center.x) * cos - (y - center.y) * sin + center.x,
-        y: (x - center.x) * sin + (y - center.y) * cos + center.y,
-    });
-
-    const points = [];
-    if (settings.symmetrical) {
-        for (let i = 0; i < settings.sides; i++) {
-            points.push(rotatePoint(currentPoint.x, currentPoint.y, cosAngles[i], sinAngles[i]));
-            points.push(rotatePoint(2 * center.x - currentPoint.x, currentPoint.y, cosAngles[i], sinAngles[i]));
-        }
-    } else {
-        points.push(currentPoint);
-    }
-
-    for (const point of points) {
-        const x = Math.round(point.x);
-        const y = Math.round(point.y);
-
-        if (x < 0 || x >= settings.canvasSize || y < 0 || y >= settings.canvasSize) continue;
-
-        const index = y * settings.canvasSize + x;
-
-        if (imageMatrix[index] === 0) {
-            state.newPixelsSinceLastCheck++;
-        }
-
-        const val = ++imageMatrix[index];
-        if (val > state.maxValue) {
-            state.maxValue = val;
-        }
-    }
+    const { jumpDistance } = settings;
+    state.currentPoint.x += (randomVertex.x - state.currentPoint.x) * jumpDistance;
+    state.currentPoint.y += (randomVertex.y - state.currentPoint.y) * jumpDistance;
 }
 
 function updatePixelDataFromMatrix() {
@@ -419,15 +349,69 @@ function checkStability() {
 function drawLoop(timestamp) {
     if (!state.isRunning) return;
 
+    const { settings, center, cosAngles, sinAngles, imageMatrix } = state;
+    const { canvasSize, symmetrical, sides } = settings;
+    const centerX = center.x;
+    const centerY = center.y;
+
     const startTime = performance.now();
     while (performance.now() - startTime < TIME_BUDGET) {
         for (let i = 0; i < DEFAULT_BATCH_SIZE; i++) {
-            updateMatrix();
+            updateCurrentPoint();
+            const { x: currentX, y: currentY } = state.currentPoint;
+
+            if (symmetrical) {
+                // Pre-calculate relative coordinates to the center
+                const relX = currentX - centerX;
+                const relY = currentY - centerY;
+                const mirroredRelX = -relX;
+
+                for (let j = 0; j < sides; j++) {
+                    const cos = cosAngles[j];
+                    const sin = sinAngles[j];
+
+                    // Point 1: Rotated original
+                    const rotatedX1 = relX * cos - relY * sin + centerX;
+                    const rotatedY1 = relX * sin + relY * cos + centerY;
+
+                    // Point 2: Rotated mirrored
+                    const rotatedX2 = mirroredRelX * cos - relY * sin + centerX;
+                    const rotatedY2 = mirroredRelX * sin + relY * cos + centerY;
+
+                    const p1x = rotatedX1 | 0;
+                    const p1y = rotatedY1 | 0;
+                    const p2x = rotatedX2 | 0;
+                    const p2y = rotatedY2 | 0;
+
+                    if (p1x >= 0 && p1x < canvasSize && p1y >= 0 && p1y < canvasSize) {
+                        const index = p1y * canvasSize + p1x;
+                        if (imageMatrix[index] === 0) state.newPixelsSinceLastCheck++;
+                        const val = ++imageMatrix[index];
+                        if (val > state.maxValue) state.maxValue = val;
+                    }
+                    if (p2x >= 0 && p2x < canvasSize && p2y >= 0 && p2y < canvasSize) {
+                        const index = p2y * canvasSize + p2x;
+                        if (imageMatrix[index] === 0) state.newPixelsSinceLastCheck++;
+                        const val = ++imageMatrix[index];
+                        if (val > state.maxValue) state.maxValue = val;
+                    }
+                }
+            } else {
+                const px = currentX | 0;
+                const py = currentY | 0;
+
+                if (px >= 0 && px < canvasSize && py >= 0 && py < canvasSize) {
+                    const index = py * canvasSize + px;
+                    if (imageMatrix[index] === 0) state.newPixelsSinceLastCheck++;
+                    const val = ++imageMatrix[index];
+                    if (val > state.maxValue) state.maxValue = val;
+                }
+            }
         }
-        const pointsPerBatch = state.settings.symmetrical ? state.settings.sides * 2 : 1;
+        const pointsPerBatch = symmetrical ? sides * 2 : 1;
         state.iterations += DEFAULT_BATCH_SIZE * pointsPerBatch;
 
-        if (state.settings.autoStop && state.iterations >= DEFAULT_STABILITY_INTERVAL) {
+        if (settings.autoStop && state.iterations >= DEFAULT_STABILITY_INTERVAL) {
             if (checkStability()) {
                 self.postMessage({type: 'finish', data: {time: performance.now() - state.runTime}});
                 stop();
@@ -437,7 +421,7 @@ function drawLoop(timestamp) {
     }
 
     if (timestamp - state.lastUpdateTime > DEFAULT_UPDATE_DELAY) {
-        if (state.settings.liveRendering) {
+        if (settings.liveRendering) {
             renderFrame();
         }
         state.lastUpdateTime = timestamp;
