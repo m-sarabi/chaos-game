@@ -49,6 +49,13 @@ canvas {
     padding: 10px;
 }
 
+.render-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px;
+}
+
 .options {
     order: 0;
     display: flex;

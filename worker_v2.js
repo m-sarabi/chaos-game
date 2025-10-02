@@ -145,7 +145,6 @@ function preDraw() {
 }
 
 function buildRestrictions() {
-    // This function is identical to the original, just moved here.
     const sides = settings.midpointVertex ? settings.sides * 2 : settings.sides;
     allowedMoves = [];
 
@@ -250,7 +249,6 @@ function updateMatrix() {
 
         if (val > maxValue) maxValue = val;
 
-        // val = (val / maxValue) ** settings.gammaExponent;
         const logMax = Math.log(1 + maxValue);
         const normalizedVal = normalizeValue(val, logMax);
 
@@ -259,7 +257,6 @@ function updateMatrix() {
 }
 
 function rescaleAll() {
-    // Pre-calculate the log of the final max value ONCE for efficiency.
     const logMax = Math.log(1 + maxValue);
 
     for (let i = 0; i < imageMatrix.length; i++) {
@@ -376,7 +373,9 @@ function drawLoop(timestamp) {
     }
 
     if (timestamp - lastUpdateTime > DEFAULT_UPDATE_DELAY) {
-        renderFrame();
+        if (settings.liveRendering) {
+            renderFrame();
+        }
         lastUpdateTime = timestamp;
     }
 
@@ -461,8 +460,11 @@ self.onmessage = (e) => {
                 needsRender = true;
             } else if (['drawCircle', 'drawPolygon'].includes(key)) {
                 needsRender = true;
+            } else if (key === 'liveRendering' && value === true) {
+                // User just re-enabled rendering, send the current frame immediately
+                needsRender = true;
             }
-            if (needsRender && !isRunning) {
+            if (needsRender && (!isRunning || settings.liveRendering)) {
                 renderFrame();
             }
             break;

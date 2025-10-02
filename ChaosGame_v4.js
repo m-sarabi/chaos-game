@@ -1,17 +1,18 @@
 class ChaosGame {
     /**
-     * @param {HTMLCanvasElement} showCanvas The canvas element to draw the preview output on.
+     * @param {HTMLCanvasElement | null} showCanvas The canvas element to draw the preview output on.
      * @param {Object} settings The initial settings of the simulation.
      */
     constructor(showCanvas, settings) {
         this.showCanvas = showCanvas;
-        this.showCtx = this.showCanvas.getContext('2d');
-
         this.settings = settings;
         this.listeners = {};
+        this.lastBitmap = null;
+
+        this.showCtx = this.showCanvas ? this.showCanvas.getContext('2d') : null;
 
         // The class creates and manages its own worker
-        this.worker = new Worker('worker_v1.js');
+        this.worker = new Worker('worker_v2.js');
         this.worker.onmessage = this.handleWorkerMessage.bind(this);
 
         this.init();
@@ -34,8 +35,11 @@ class ChaosGame {
         switch (type) {
             case 'render': {
                 const imageBitmap = data.imageBitmap;
+                if (this.lastBitmap) {
+                    this.lastBitmap.close();
+                }
+                this.lastBitmap = imageBitmap;
                 this.drawShowCanvas(imageBitmap);
-                imageBitmap.close();
                 break;
             }
             case 'stabilityCheck':
@@ -57,8 +61,12 @@ class ChaosGame {
     }
 
     drawShowCanvas(imageBitmap) {
+        if (!this.showCtx) {
+            return;
+        }
+
         this.showCtx.clearRect(0, 0, this.showCanvas.width, this.showCanvas.height);
-        if (imageBitmap) {
+        if (this.lastBitmap) {
             this.showCtx.drawImage(imageBitmap, 0, 0, this.showCanvas.width, this.showCanvas.height);
         }
     }
@@ -72,6 +80,10 @@ class ChaosGame {
     }
 
     reset() {
+        if (this.lastBitmap) {
+            this.lastBitmap.close();
+            this.lastBitmap = null;
+        }
         // When resetting, we pass the current settings to the worker
         this.worker.postMessage({type: 'reset', settings: this.settings});
     }

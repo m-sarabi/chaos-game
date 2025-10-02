@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         midpointVertex: document.getElementById('midpoint-vertex'),
         linesToggle: document.getElementById('show-lines'),
         autoStop: document.getElementById('auto-stop'),
+        liveRendering: document.getElementById('live-rendering'),
         showCanvas: document.getElementById('chaos-canvas'),
         toggleOptionsButton: document.getElementById('show-options'),
         optionsContainer: document.querySelector('.options'),
@@ -44,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
             drawCircle: elements.linesToggle.checked,
             drawPolygon: elements.linesToggle.checked,
             autoStop: elements.autoStop.checked,
+            liveRendering: elements.liveRendering.checked,
             bgColor: elements.bgInput.value,
             fgColor: elements.fgInput.value,
             solidBg: elements.solidBg.checked,
@@ -147,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.bgInput.addEventListener('input', () => chaosGame.updateSetting('bgColor', elements.bgInput.value));
     elements.fgInput.addEventListener('input', () => chaosGame.updateSetting('fgColor', elements.fgInput.value));
     elements.solidBg.addEventListener('input', () => chaosGame.updateSetting('solidBg', elements.solidBg.checked));
+    elements.liveRendering.addEventListener('change', () => chaosGame.updateSetting('liveRendering', elements.liveRendering.checked));
 
     window.addEventListener('resize', () => {
         if (document.documentElement.clientWidth === oldWidth) {
