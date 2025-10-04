@@ -1,7 +1,7 @@
 # Chaos Game
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-<!--[![npm version](https://badge.fury.io/js/chaos_game.svg)](https://badge.fury.io/js/chaos_game)-->
+[![npm version](https://badge.fury.io/js/chaos_game.svg)](https://badge.fury.io/js/chaos_game)
 
 A high-performance, highly configurable fractal generator based on the Chaos Game algorithm, using a
 **Web Worker** and an **OffscreenCanvas** to ensure a smooth, non-blocking user experience, even with millions of
