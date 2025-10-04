@@ -22,7 +22,7 @@ let state = {
     filledPixels: 0,
     runTime: null,
     isRunning: false,
-    animationFrameId: null,
+    loopId: null,
     lastUpdateTime: 0,
 };
 
@@ -325,7 +325,6 @@ function renderFrame() {
 }
 
 function checkStability() {
-    state.iterations = 0;
     state.newPixelsEma = EMA_ALPHA * state.newPixelsSinceLastCheck + (1 - EMA_ALPHA) * state.newPixelsEma;
     state.filledPixels += state.newPixelsSinceLastCheck;
     const newFillRatio = Math.max(0, 1 - state.newPixelsSinceLastCheck / state.filledPixels) * 100;
@@ -346,7 +345,7 @@ function checkStability() {
 
 // --- Main Loop and Controls ---
 
-function drawLoop(timestamp) {
+function drawLoop() {
     if (!state.isRunning) return;
 
     const {settings, center, cosAngles, sinAngles, imageMatrix} = state;
@@ -355,80 +354,80 @@ function drawLoop(timestamp) {
     const centerY = center.y;
 
     const startTime = performance.now();
-    while (performance.now() - startTime < TIME_BUDGET) {
-        for (let i = 0; i < DEFAULT_BATCH_SIZE; i++) {
-            updateCurrentPoint();
-            const {x: currentX, y: currentY} = state.currentPoint;
+    for (let i = 0; i < DEFAULT_BATCH_SIZE; i++) {
+        updateCurrentPoint();
+        const {x: currentX, y: currentY} = state.currentPoint;
 
-            if (symmetrical) {
-                // Pre-calculate relative coordinates to the center
-                const relX = currentX - centerX;
-                const relY = currentY - centerY;
-                const mirroredRelX = -relX;
+        if (symmetrical) {
+            // Pre-calculate relative coordinates to the center
+            const relX = currentX - centerX;
+            const relY = currentY - centerY;
+            const mirroredRelX = -relX;
 
-                for (let j = 0; j < sides; j++) {
-                    const cos = cosAngles[j];
-                    const sin = sinAngles[j];
+            for (let j = 0; j < sides; j++) {
+                const cos = cosAngles[j];
+                const sin = sinAngles[j];
 
-                    // Point 1: Rotated original
-                    const rotatedX1 = relX * cos - relY * sin + centerX;
-                    const rotatedY1 = relX * sin + relY * cos + centerY;
+                // Point 1: Rotated original
+                const rotatedX1 = relX * cos - relY * sin + centerX;
+                const rotatedY1 = relX * sin + relY * cos + centerY;
 
-                    // Point 2: Rotated mirrored
-                    const rotatedX2 = mirroredRelX * cos - relY * sin + centerX;
-                    const rotatedY2 = mirroredRelX * sin + relY * cos + centerY;
+                // Point 2: Rotated mirrored
+                const rotatedX2 = mirroredRelX * cos - relY * sin + centerX;
+                const rotatedY2 = mirroredRelX * sin + relY * cos + centerY;
 
-                    const p1x = rotatedX1 | 0;
-                    const p1y = rotatedY1 | 0;
-                    const p2x = rotatedX2 | 0;
-                    const p2y = rotatedY2 | 0;
+                const p1x = rotatedX1 | 0;
+                const p1y = rotatedY1 | 0;
+                const p2x = rotatedX2 | 0;
+                const p2y = rotatedY2 | 0;
 
-                    if (p1x >= 0 && p1x < canvasSize && p1y >= 0 && p1y < canvasSize) {
-                        const index = p1y * canvasSize + p1x;
-                        if (imageMatrix[index] === 0) state.newPixelsSinceLastCheck++;
-                        const val = ++imageMatrix[index];
-                        if (val > state.maxValue) state.maxValue = val;
-                    }
-                    if (p2x >= 0 && p2x < canvasSize && p2y >= 0 && p2y < canvasSize) {
-                        const index = p2y * canvasSize + p2x;
-                        if (imageMatrix[index] === 0) state.newPixelsSinceLastCheck++;
-                        const val = ++imageMatrix[index];
-                        if (val > state.maxValue) state.maxValue = val;
-                    }
+                if (p1x >= 0 && p1x < canvasSize && p1y >= 0 && p1y < canvasSize) {
+                    const index = p1y * canvasSize + p1x;
+                    if (imageMatrix[index] === 0) state.newPixelsSinceLastCheck++;
+                    const val = ++imageMatrix[index];
+                    if (val > state.maxValue) state.maxValue = val;
                 }
-            } else {
-                const px = currentX | 0;
-                const py = currentY | 0;
-
-                if (px >= 0 && px < canvasSize && py >= 0 && py < canvasSize) {
-                    const index = py * canvasSize + px;
+                if (p2x >= 0 && p2x < canvasSize && p2y >= 0 && p2y < canvasSize) {
+                    const index = p2y * canvasSize + p2x;
                     if (imageMatrix[index] === 0) state.newPixelsSinceLastCheck++;
                     const val = ++imageMatrix[index];
                     if (val > state.maxValue) state.maxValue = val;
                 }
             }
-        }
-        const pointsPerBatch = symmetrical ? sides * 2 : 1;
-        state.iterations += DEFAULT_BATCH_SIZE * pointsPerBatch;
+        } else {
+            const px = currentX | 0;
+            const py = currentY | 0;
 
-        const stable = checkStability();
-        if (settings.autoStop && state.iterations >= DEFAULT_STABILITY_INTERVAL) {
-            if (stable) {
-                self.postMessage({type: 'finish', data: {time: performance.now() - state.runTime}});
-                stop();
-                return;
+            if (px >= 0 && px < canvasSize && py >= 0 && py < canvasSize) {
+                const index = py * canvasSize + px;
+                if (imageMatrix[index] === 0) state.newPixelsSinceLastCheck++;
+                const val = ++imageMatrix[index];
+                if (val > state.maxValue) state.maxValue = val;
             }
         }
     }
+    const pointsPerBatch = symmetrical ? sides * 2 : 1;
+    state.iterations += DEFAULT_BATCH_SIZE * pointsPerBatch;
 
-    if (timestamp - state.lastUpdateTime > DEFAULT_UPDATE_DELAY) {
+    const stable = checkStability();
+    if (settings.autoStop && state.iterations >= DEFAULT_STABILITY_INTERVAL) {
+        state.iterations = 0;
+        if (stable) {
+            self.postMessage({type: 'finish', data: {time: performance.now() - state.runTime}});
+            stop();
+            return;
+        }
+    }
+
+    const now = performance.now();
+    if (now - state.lastUpdateTime > DEFAULT_UPDATE_DELAY) {
         if (settings.liveRendering) {
             renderFrame();
         }
-        state.lastUpdateTime = timestamp;
+        state.lastUpdateTime = now;
     }
 
-    state.animationFrameId = self.requestAnimationFrame(drawLoop);
+    state.loopId = setTimeout(drawLoop, 0);
 }
 
 
@@ -438,16 +437,16 @@ function play() {
     state.isRunning = true;
     state.runTime = performance.now();
     state.lastUpdateTime = performance.now();
-    state.animationFrameId = self.requestAnimationFrame(drawLoop);
+    drawLoop();
 }
 
 function stop() {
     if (!state.isRunning) return;
     state.runTime = null;
     state.isRunning = false;
-    if (state.animationFrameId) {
-        self.cancelAnimationFrame(state.animationFrameId);
-        state.animationFrameId = null;
+    if (state.loopId) {
+        clearTimeout(state.loopId);
+        state.loopId = null;
     }
     renderFrame();
 }
