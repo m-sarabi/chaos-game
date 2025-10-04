@@ -1,3 +1,5 @@
+import ChaosWorker from './worker.js?worker&inline';
+
 /**
  * @typedef {'none' | 'no-repeat' | 'no-double-repeat' | 'no-return' | 'no-neighbor' | 'no-neighbor-after-repeat'} RestrictionRule
  * The rule for choosing the next vertex.
@@ -46,7 +48,7 @@ class ChaosGame {
         this.showCtx = this.showCanvas ? this.showCanvas.getContext('2d') : null;
 
         // The class creates and manages its own worker
-        this.worker = new Worker(new URL('./worker.js', import.meta.url));
+        this.worker = new ChaosWorker();
         this.worker.onmessage = this.handleWorkerMessage.bind(this);
 
         this.init();
