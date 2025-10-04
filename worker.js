@@ -412,7 +412,8 @@ function drawLoop(timestamp) {
         state.iterations += DEFAULT_BATCH_SIZE * pointsPerBatch;
 
         if (settings.autoStop && state.iterations >= DEFAULT_STABILITY_INTERVAL) {
-            if (checkStability()) {
+            const stable = checkStability();
+            if (stable) {
                 self.postMessage({type: 'finish', data: {time: performance.now() - state.runTime}});
                 stop();
                 return;
