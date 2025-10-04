@@ -196,3 +196,5 @@ class ChaosGame {
         this.worker.postMessage({type: 'getBlob'});
     }
 }
+
+export default ChaosGame;
