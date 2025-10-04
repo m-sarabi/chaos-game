@@ -1,5 +1,5 @@
 {
-  "name": "chaos_game",
+  "name": "chaos-game",
   "version": "1.0.0",
   "description": "A highly configurable Chaos Game fractal generator.",
   "type": "module",
@@ -24,10 +24,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/m-sarabi/chaos_game.git"
+    "url": "git+https://github.com/m-sarabi/chaos-game.git"
   },
   "bugs": {
-    "url": "https://github.com/m-sarabi/chaos_game/issues",
+    "url": "https://github.com/m-sarabi/chaos-game/issues",
     "email": "m.sarabi.jkd@gmail.com"
   },
   "homepage": "https://github.com/your-username/chaos-game-js#readme",

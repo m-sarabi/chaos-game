@@ -1,7 +1,7 @@
 # Chaos Game
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![npm version](https://badge.fury.io/js/chaos_game.svg)](https://badge.fury.io/js/chaos_game)
+[![npm version](https://badge.fury.io/js/chaos-game.svg)](https://badge.fury.io/js/chaos-game)
 
 A high-performance, highly configurable fractal generator based on the Chaos Game algorithm, using a
 **Web Worker** and an **OffscreenCanvas** to ensure a smooth, non-blocking user experience, even with millions of
@@ -105,7 +105,7 @@ You can use Chaos Game JS either by installing it as an NPM package or by includ
 
 1.  **Installation**
     ```bash
-    npm install chaos_game
+    npm install chaos-game
     ```
 
 2.  **HTML Setup**
@@ -125,7 +125,7 @@ You can use Chaos Game JS either by installing it as an NPM package or by includ
     In your `main.js` file, import the `ChaosGame` class, define your settings, and start the simulation.
 
     ```javascript
-    import { ChaosGame } from 'chaos_game';
+    import { ChaosGame } from 'chaos-game';
 
     const canvas = document.getElementById('chaos-canvas');
 
@@ -154,7 +154,7 @@ You can use Chaos Game JS either by installing it as an NPM package or by includ
       <canvas id="chaos-canvas" width="800" height="800"></canvas>
 
       <!-- 1. Load the library from the CDN -->
-      <script src="https://cdn.jsdelivr.net/npm/chaos_game"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chaos-game"></script>
 
       <!-- 2. Your script to run the game -->
       <script>
