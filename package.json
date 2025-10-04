@@ -1,0 +1,59 @@
+{
+  "name": "chaos_game",
+  "version": "1.0.0",
+  "description": "A highly configurable Chaos Game fractal generator.",
+  "type": "module",
+  "main": "./dist/chaos-game.umd.cjs",
+  "module": "./dist/chaos-game.js",
+  "exports": {
+    ".": {
+      "import": "./dist/chaos-game.js",
+      "require": "./dist/chaos-game.umd.cjs"
+    }
+  },
+  "jsdelivr": "./dist/chaos-game.umd.cjs",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "^7.1.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/m-sarabi/chaos_game.git"
+  },
+  "bugs": {
+    "url": "https://github.com/m-sarabi/chaos_game/issues",
+    "email": "m.sarabi.jkd@gmail.com"
+  },
+  "homepage": "https://github.com/your-username/chaos-game-js#readme",
+  "keywords": [
+    "chaos-game",
+    "iterated-function-system",
+    "offscreencanvas",
+    "creative-coding",
+    "generative-art",
+    "visualization",
+    "non-blocking",
+    "performance",
+    "mathematics",
+    "javascript",
+    "chaos game",
+    "web-worker",
+    "web worker",
+    "simulation",
+    "sierpinski",
+    "generator",
+    "attractor",
+    "geometry",
+    "fractal",
+    "canvas",
+    "ifs"
+  ],
+  "author": "Mohammad Sarabi <m.sarabi.jkd@gmail.com>",
+  "license": "MIT"
+}
