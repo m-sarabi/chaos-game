@@ -229,7 +229,7 @@ function updateCurrentPoint() {
             case 'no-neighbor-after-repeat': {
                 const sides = settings.midpointVertex ? settings.sides * 2 : settings.sides;
                 if (lastIndex !== undefined && lastIndex === prevLastIndex && lastIndex < sides && currentIndex < sides) {
-                     const diff = Math.abs(currentIndex - lastIndex);
+                    const diff = Math.abs(currentIndex - lastIndex);
                     if (diff === 1 || diff === sides - 1) isForbidden = true;
                 }
                 break;
@@ -243,7 +243,7 @@ function updateCurrentPoint() {
     }
 
     const randomVertex = vertices[currentIndex];
-    const { jumpDistance } = settings;
+    const {jumpDistance} = settings;
     state.currentPoint.x += (randomVertex.x - state.currentPoint.x) * jumpDistance;
     state.currentPoint.y += (randomVertex.y - state.currentPoint.y) * jumpDistance;
 }
@@ -349,8 +349,8 @@ function checkStability() {
 function drawLoop(timestamp) {
     if (!state.isRunning) return;
 
-    const { settings, center, cosAngles, sinAngles, imageMatrix } = state;
-    const { canvasSize, symmetrical, sides } = settings;
+    const {settings, center, cosAngles, sinAngles, imageMatrix} = state;
+    const {canvasSize, symmetrical, sides} = settings;
     const centerX = center.x;
     const centerY = center.y;
 
@@ -358,7 +358,7 @@ function drawLoop(timestamp) {
     while (performance.now() - startTime < TIME_BUDGET) {
         for (let i = 0; i < DEFAULT_BATCH_SIZE; i++) {
             updateCurrentPoint();
-            const { x: currentX, y: currentY } = state.currentPoint;
+            const {x: currentX, y: currentY} = state.currentPoint;
 
             if (symmetrical) {
                 // Pre-calculate relative coordinates to the center
@@ -411,8 +411,8 @@ function drawLoop(timestamp) {
         const pointsPerBatch = symmetrical ? sides * 2 : 1;
         state.iterations += DEFAULT_BATCH_SIZE * pointsPerBatch;
 
+        const stable = checkStability();
         if (settings.autoStop && state.iterations >= DEFAULT_STABILITY_INTERVAL) {
-            const stable = checkStability();
             if (stable) {
                 self.postMessage({type: 'finish', data: {time: performance.now() - state.runTime}});
                 stop();
@@ -491,7 +491,7 @@ self.onmessage = (e) => {
                 renderFrame();
 
             } else if (colorKeys.includes(key)) {
-                    updateColors();
+                updateColors();
                 if (state.settings.solidBg) {
                     const bg32 = (0xFF << 24) | (state.bgColor.b << 16) | (state.bgColor.g << 8) | state.bgColor.r;
                     state.pixelData.fill(bg32);
