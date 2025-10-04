@@ -3,15 +3,15 @@
   "version": "1.0.1",
   "description": "A highly configurable Chaos Game fractal generator.",
   "type": "module",
-  "main": "./dist/chaos-game.umd.cjs",
-  "module": "./dist/chaos-game.js",
+  "main": "./dist/chaos-game.umd.js",
+  "module": "./dist/chaos-game.es.js",
   "exports": {
     ".": {
-      "import": "./dist/chaos-game.js",
-      "require": "./dist/chaos-game.umd.cjs"
+      "import": "./dist/chaos-game.es.js",
+      "require": "./dist/chaos-game.umd.js"
     }
   },
-  "jsdelivr": "./dist/chaos-game.umd.cjs",
+  "jsdelivr": "./dist/chaos-game.umd.js",
   "files": [
     "dist"
   ],
