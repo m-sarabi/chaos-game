@@ -146,10 +146,11 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.jumpDistance.addEventListener('change', () => chaosGame.updateSetting('jumpDistance', parseFloat(elements.jumpDistance.value)));
     elements.gammaExponent.addEventListener('change', () => chaosGame.updateSetting('gammaExponent', parseFloat(elements.gammaExponent.value)));
     elements.threshold.addEventListener('change', () => chaosGame.updateSetting('stabilityNewPixelsThreshold', parseFloat(elements.threshold.value)));
-    elements.bgInput.addEventListener('input', () => chaosGame.updateSetting('bgColor', elements.bgInput.value));
-    elements.fgInput.addEventListener('input', () => chaosGame.updateSetting('fgColor', elements.fgInput.value));
-    elements.solidBg.addEventListener('input', () => chaosGame.updateSetting('solidBg', elements.solidBg.checked));
+    elements.bgInput.addEventListener('change', () => chaosGame.updateSetting('bgColor', elements.bgInput.value));
+    elements.fgInput.addEventListener('change', () => chaosGame.updateSetting('fgColor', elements.fgInput.value));
+    elements.solidBg.addEventListener('change', () => chaosGame.updateSetting('solidBg', elements.solidBg.checked));
     elements.liveRendering.addEventListener('change', () => chaosGame.updateSetting('liveRendering', elements.liveRendering.checked));
+    elements.autoStop.addEventListener('change', () => chaosGame.updateSetting('autoStop', elements.autoStop.checked));
 
     window.addEventListener('resize', () => {
         if (document.documentElement.clientWidth === oldWidth) {
