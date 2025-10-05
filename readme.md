@@ -186,7 +186,7 @@ You can pass any of these options in the `settings` object during instantiation 
 |-------------------------------|-----------|---------------------------------------------------------------------------|
 | `canvasSize`                  | `number`  | Width and height of the canvas in pixels.                                 |
 | `sides`                       | `number`  | Number of vertices in the main polygon.                                   |
-| `jumpDistance`                | `number`  | Fraction of the distance to move towards the chosen vertex (0.0 to 1.0).  |
+| `jumpDistance`                | `number`  | Fraction of the distance to move towards the chosen vertex.               |
 | `padding`                     | `number`  | Margin in pixels from the canvas edge to the polygon.                     |
 | `midpointVertex`              | `boolean` | If true, adds vertices at the midpoint of each side.                      |
 | `centerVertex`                | `boolean` | If true, adds a vertex at the center of the polygon.                      |
