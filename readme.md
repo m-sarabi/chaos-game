@@ -154,7 +154,7 @@ You can use Chaos Game JS either by installing it as an NPM package or by includ
       <canvas id="chaos-canvas" width="800" height="800"></canvas>
 
       <!-- 1. Load the library from the CDN -->
-      <script src="https://cdn.jsdelivr.net/npm/chaos-game@1.0.3"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chaos-game@1.0.4"></script>
 
       <!-- 2. Your script to run the game -->
       <script>
