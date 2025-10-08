@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.showCanvas.height = size;
         elements.showCanvas.width = size;
         if (chaosGame) {
-            chaosGame.drawShowCanvas();
+            chaosGame.drawShowCanvas(chaosGame.lastBitmap);
         }
     }
 

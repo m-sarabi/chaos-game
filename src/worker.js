@@ -662,10 +662,23 @@ self.onmessage = (e) => {
             break;
         }
         case 'getBlob': {
-            // Prepares the final canvas and converts it to a PNG blob to be sent back.
+            // Safely pause the simulation to prevent a race condition with transferToImageBitmap
+            const wasRunning = state.isRunning;
+            if (wasRunning) {
+                state.isRunning = false;
+                clearTimeout(state.loopId);
+                state.loopId = null;
+            }
+
             prepareCanvasForOutput();
             offscreenCanvas.convertToBlob({type: 'image/png'}).then(blob => {
                 self.postMessage({type: 'blobReady', data: {blob}});
+
+                // If the simulation was running before, resume it
+                if (wasRunning) {
+                    state.isRunning = true;
+                    state.loopId = setTimeout(drawLoop, 0);
+                }
             });
             break;
         }
