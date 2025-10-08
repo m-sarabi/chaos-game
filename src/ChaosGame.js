@@ -47,6 +47,28 @@ class ChaosGame {
         /** @type {CanvasRenderingContext2D | null} */
         this.showCtx = this.showCanvas ? this.showCanvas.getContext('2d') : null;
 
+        /** @type {ChaosGameSettings} */
+        this.settings = {
+            canvasSize: 1000,
+            sides: 3,
+            jumpDistance: 0.5,
+            padding: 10,
+            midpointVertex: false,
+            centerVertex: false,
+            restriction: 'none',
+            fgColor: '#FFFFFF',
+            bgColor: '#000000',
+            solidBg: true,
+            gammaExponent: 3,
+            drawCircle: false,
+            drawPolygon: false,
+            symmetrical: true,
+            autoStop: true,
+            liveRendering: true,
+            stabilityNewPixelsThreshold: 1,
+            ...settings,
+        };
+
         // The class creates and manages its own worker
         this.worker = new ChaosWorker();
         this.worker.onmessage = this.handleWorkerMessage.bind(this);

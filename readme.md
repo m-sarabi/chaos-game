@@ -182,25 +182,25 @@ You can use Chaos Game JS either by installing it as an NPM package or by includ
 You can pass any of these options in the `settings` object during instantiation or update them later with
 `updateSetting(key, value)`.
 
-| Option                        | Type      | Description                                                               |
-|-------------------------------|-----------|---------------------------------------------------------------------------|
-| `canvasSize`                  | `number`  | Width and height of the canvas in pixels.                                 |
-| `sides`                       | `number`  | Number of vertices in the main polygon.                                   |
-| `jumpDistance`                | `number`  | Fraction of the distance to move towards the chosen vertex.               |
-| `padding`                     | `number`  | Margin in pixels from the canvas edge to the polygon.                     |
-| `midpointVertex`              | `boolean` | If true, adds vertices at the midpoint of each side.                      |
-| `centerVertex`                | `boolean` | If true, adds a vertex at the center of the polygon.                      |
-| `restriction`                 | `string`  | The rule for choosing the next vertex (e.g., `'none'`, `'no-repeat'`).    |
-| `fgColor`                     | `string`  | The foreground color for points and outlines (CSS format).                |
-| `bgColor`                     | `string`  | The background color (CSS format).                                        |
-| `solidBg`                     | `boolean` | If true, use a solid background; otherwise, it's transparent.             |
-| `gammaExponent`               | `number`  | Gamma correction value for adjusting brightness and contrast.             |
-| `drawCircle`                  | `boolean` | If true, draws the circumscribing circle.                                 |
-| `drawPolygon`                 | `boolean` | If true, draws the main polygon's outline.                                |
-| `symmetrical`                 | `boolean` | If true, applies rotational and reflectional symmetry.                    |
-| `autoStop`                    | `boolean` | If true, the simulation stops automatically when stable.                  |
-| `liveRendering`               | `boolean` | If true, the canvas updates periodically during the simulation.           |
-| `stabilityNewPixelsThreshold` | `number`  | Threshold for new pixels below which the simulation is considered stable. |
+| Option                        | Type      | Default   | Description                                                               |
+|-------------------------------|-----------|-----------|---------------------------------------------------------------------------|
+| `canvasSize`                  | `number`  | 1000      | Width and height of the canvas in pixels.                                 |
+| `sides`                       | `number`  | 3         | Number of vertices in the main polygon.                                   |
+| `jumpDistance`                | `number`  | 0.5       | Fraction of the distance to move towards the chosen vertex.               |
+| `padding`                     | `number`  | 10        | Margin in pixels from the canvas edge to the polygon.                     |
+| `midpointVertex`              | `boolean` | false     | If true, adds vertices at the midpoint of each side.                      |
+| `centerVertex`                | `boolean` | false     | If true, adds a vertex at the center of the polygon.                      |
+| `restriction`                 | `string`  | 'none'    | The rule for choosing the next vertex (e.g., `'none'`, `'no-repeat'`).    |
+| `fgColor`                     | `string`  | '#FFFFFF' | The foreground color for points and outlines (CSS format).                |
+| `bgColor`                     | `string`  | '#000000' | The background color (CSS format).                                        |
+| `solidBg`                     | `boolean` | true      | If true, use a solid background; otherwise, it's transparent.             |
+| `gammaExponent`               | `number`  | 3         | Gamma correction value for adjusting brightness and contrast.             |
+| `drawCircle`                  | `boolean` | false     | If true, draws the circumscribing circle.                                 |
+| `drawPolygon`                 | `boolean` | false     | If true, draws the main polygon's outline.                                |
+| `symmetrical`                 | `boolean` | true      | If true, applies rotational and reflectional symmetry.                    |
+| `autoStop`                    | `boolean` | true      | If true, the simulation stops automatically when stable.                  |
+| `liveRendering`               | `boolean` | true      | If true, the canvas updates periodically during the simulation.           |
+| `stabilityNewPixelsThreshold` | `number`  | 1         | Threshold for new pixels below which the simulation is considered stable. |
 
 ### Methods
 

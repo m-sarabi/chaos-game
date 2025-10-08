@@ -11,7 +11,7 @@ export default defineConfig({
             formats: ['es', 'umd'],
             fileName: (format) => {
                 if (format === 'umd') {
-                    return 'chaos-game.umd.js'; // The key change is here!
+                    return 'chaos-game.umd.js';
                 }
                 return 'chaos-game.es.js';
             },
