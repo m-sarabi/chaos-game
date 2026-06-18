@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bgInput: document.getElementById('bg-color'),
         fgInput: document.getElementById('fg-color'),
         solidBg: document.getElementById('solid-bg'),
+        loadingOverlay: document.getElementById('loading-overlay'),
     };
 
 
@@ -83,6 +84,47 @@ document.addEventListener('DOMContentLoaded', () => {
     let chaosGame;
     let oldWidth = document.documentElement.clientWidth;
     let optionsOpen = false;
+    let isGenerating = false;
+
+    function setUIInteractive(interactive) {
+        const elementsToToggle = document.querySelectorAll('button, input, select');
+        elementsToToggle.forEach(el => {
+            if (!interactive) {
+                // Save current disabled state to restore it accurately later
+                if (el.disabled) {
+                    el.dataset.wasDisabled = "true";
+                } else {
+                    el.removeAttribute('data-was-disabled');
+                    el.disabled = true;
+                }
+            } else {
+                // Restore original state
+                if (el.dataset.wasDisabled === "true") {
+                    el.disabled = true;
+                } else {
+                    el.disabled = false;
+                }
+                el.removeAttribute('data-was-disabled');
+            }
+        });
+    }
+
+    function showLoading(message = "Generating high-quality image...") {
+        isGenerating = true;
+        const textEl = elements.loadingOverlay.querySelector('span');
+        if (textEl) {
+            textEl.textContent = message;
+        }
+        elements.loadingOverlay.classList.remove('hidden');
+        setUIInteractive(false);
+    }
+
+    function hideLoading() {
+        isGenerating = false;
+        elements.loadingOverlay.classList.add('hidden');
+        setUIInteractive(true);
+    }
+
     resizeShowCanvas();
     const initialSettings = getSettingsFromDOM();
     chaosGame = new ChaosGame(elements.showCanvas, initialSettings);
@@ -94,9 +136,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     chaosGame.on('finish', (data) => {
-        elements.playButton.disabled = false;
-        elements.stopButton.disabled = true;
+        // elements.playButton.disabled = false;
+        // elements.stopButton.disabled = true;
+        showLoading();
         console.log(data.time);
+    });
+
+    chaosGame.on('render', () => {
+        if (isGenerating) {
+            hideLoading();
+            elements.playButton.disabled = false;
+            elements.stopButton.disabled = true;
+        }
+    });
+
+    chaosGame.on('download', () => {
+        if (isGenerating) {
+            hideLoading();
+        }
     });
 
     // --- Wire up DOM events to ChaosGame methods ---
@@ -107,16 +164,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     elements.stopButton.addEventListener('click', () => {
+        showLoading();
         chaosGame.stop();
-        elements.playButton.disabled = false;
-        elements.stopButton.disabled = true;
+        // elements.playButton.disabled = false;
+        // elements.stopButton.disabled = true;
     });
 
     elements.eraseButton.addEventListener('click', () => {
         reset();
     });
 
-    elements.downloadButton.addEventListener('click', () => chaosGame.download());
+    elements.downloadButton.addEventListener('click', () => {
+        showLoading("Preparing high-quality download...");
+        chaosGame.download();
+    });
 
     // settings that require a full reset
     ['sides', 'size', 'padding', 'restriction', 'centerVertex', 'midpointVertex'].forEach(id => {

@@ -6,7 +6,8 @@
     <title>Chaos Game</title>
     <link rel="stylesheet" href="demo/style_v01.css">
     <link rel="icon" href="./assets/icon.png" type="image/png">
-    <script src="https://cdn.jsdelivr.net/npm/chaos-game@1.2.0"></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/chaos-game@1.2.0"></script>-->
+    <script src="dist/chaos-game.umd.js"></script>
 </head>
 <body>
 <button id="show-options">
@@ -114,6 +115,10 @@
         <p>New Pixel EMA: <span id="ema-value"></span></p>
         <p>New to Fill Ratio: <span id="fill-ratio"></span></p>
     </div>
+</div>
+<div id="loading-overlay" class="loading-overlay hidden">
+    <div class="spinner"></div>
+    <span>Generating high-quality image...</span>
 </div>
 <script src="demo/script_v01.js"></script>
 </body>

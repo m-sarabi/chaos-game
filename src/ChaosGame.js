@@ -105,6 +105,7 @@ class ChaosGame {
                 }
                 this.lastBitmap = imageBitmap;
                 this.drawShowCanvas(imageBitmap);
+                this.emit('render', {imageBitmap});
                 break;
             }
             case 'stabilityCheck': {
@@ -189,7 +190,7 @@ class ChaosGame {
 
     /**
      * Registers an event listener.
-     * @param {'finish' | 'stabilityCheck' | 'download'} eventName The name of the event.
+     * @param {'finish' | 'stabilityCheck' | 'download' | 'render'} eventName The name of the event.
      * @param {(data: any) => void} callback The function to call when the event is emitted.
      */
     on(eventName, callback) {
